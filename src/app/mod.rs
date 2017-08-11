@@ -3,63 +3,66 @@ extern crate gtk;
 extern crate gdk;
 
 use self::gdk_pixbuf::{ Pixbuf };
-use std::error::{ Error };
 use gtk::prelude::*;
 
 use gtk::{
-  Window, WindowPosition, WindowType,
-  Button, HeaderBar, Box, Image
+  Button, Image, Builder, Box,
+  Revealer, Settings, CssProvider,
 };
 
 pub struct Application {
   headerbar: gtk::HeaderBar,
-  window: gtk::Window,
+  settings: gtk::Settings,
+  builder: gtk::Builder,
+  window: gtk::Window
 }
 
 impl Application {
   pub fn new() -> Application {
-    fn window() -> Window {
-      let window = Window::new(WindowType::Toplevel);
-      window.set_position(WindowPosition::Center);
-      window.set_size_request(700, 600);
-      window.set_title("Lurkmore");
-      window
-    }
+    let interface = include_str!("./interface.xml");
+    let builder = Builder::new_from_string(interface);
 
-    fn headerbar() -> HeaderBar {
-      let headerbar = HeaderBar::new();
-      // headerbar.set_subtitle(Some("Клиент для вики"));
-      // headerbar.set_title(Some("Lurkmore"));
-      headerbar
-    }
+    let headerbar = builder.get_object("app_headerbar").unwrap();
+    let window = builder.get_object("app_window").unwrap();
+    let settings = Settings::get_default().unwrap();
 
     Application {
-      headerbar: headerbar(),
-      window: window()
+      headerbar: headerbar,
+      settings: settings,
+      builder: builder,
+      window: window
     }
   }
 
+  fn setup_settings(&self) {
+    self.settings.set_property_gtk_enable_animations(true);
+    self.settings.set_property_gtk_theme_name(Some("Arc"));
+
+    let container: Box = self.builder.get_object("app_container").unwrap();
+    let container_context = container.get_style_context().unwrap();
+    let container_style = include_str!("app.css");
+    let container_provider = CssProvider::new();
+
+    container_provider.load_from_data(container_style).unwrap();
+    container_context.add_provider(&container_provider, gtk::STYLE_PROVIDER_PRIORITY_APPLICATION);
+  }
+
   fn setup_headerbar(&self) {
-    let leftbox = Box::new(gtk::Orientation::Horizontal, 0);
-    leftbox.set_baseline_position(gtk::BaselinePosition::Center);
-    
-    match Pixbuf::new_from_file_at_size("./images/logo.png", 36, 36) {
-      Err(error) => { println!("Error: {}", Error::description(&error)) },
-      Ok(logo) => {
-        let image = Image::new_from_pixbuf(Some(&logo));
-        leftbox.pack_start(&image, false, false, 3);
-      }
+    let image: Image = self.builder.get_object("app_header_logo").unwrap();
+    match Pixbuf::new_from_file_at_size("./images/logo.png", 39, 36) {
+      Ok(buffer) => { image.set_from_pixbuf(&buffer) },
+      Err(error) => { }
     }
+  }
 
-    let button = Button::new_with_label("Настройки");
-    button.connect_clicked(|_| {
-      println!("Click epta!");
+  fn setup_sidebar(&self) {
+    let button: Button = self.builder.get_object("settings_button").unwrap();
+    let sidebar: Revealer = self.builder.get_object("sidebar").unwrap();
+
+    button.connect_clicked(move |_| {
+      let is_opened = sidebar.get_reveal_child();
+      sidebar.set_reveal_child(!is_opened);
     });
-
-    leftbox.pack_end(&button, false, false, 3);
-    self.headerbar.set_custom_title(&leftbox);
-
-    self.window.set_titlebar(Some(&self.headerbar));
   }
 
   fn register_quit(&self) {
@@ -70,7 +73,9 @@ impl Application {
   }
 
   pub fn prepare_and_run(&self) {
+    self.setup_settings();
     self.setup_headerbar();
+    self.setup_sidebar();
     self.register_quit();
 
     self.window.show_all();
