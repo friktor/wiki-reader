@@ -3,10 +3,11 @@ extern crate gtk;
 extern crate gdk;
 
 use self::gdk_pixbuf::{ Pixbuf };
+use self::gdk::{ Screen };
 use gtk::prelude::*;
 
 use gtk::{
-  Button, Image, Builder, Box,
+  Button, Image, Builder, Box, StyleContext,
   Revealer, Settings, CssProvider,
 };
 
@@ -38,13 +39,16 @@ impl Application {
     self.settings.set_property_gtk_enable_animations(true);
     self.settings.set_property_gtk_theme_name(Some("Arc"));
 
-    let container: Box = self.builder.get_object("app_container").unwrap();
-    let container_context = container.get_style_context().unwrap();
-    let container_style = include_str!("app.css");
-    let container_provider = CssProvider::new();
+    let screen = Screen::get_default().unwrap();
+    let style = include_str!("app.css");
+    
+    let provider = CssProvider::new();
+    provider.load_from_data(style).unwrap();
 
-    container_provider.load_from_data(container_style).unwrap();
-    container_context.add_provider(&container_provider, gtk::STYLE_PROVIDER_PRIORITY_APPLICATION);
+    StyleContext::add_provider_for_screen(
+      &screen, &provider,
+      gtk::STYLE_PROVIDER_PRIORITY_APPLICATION
+    );
   }
 
   fn setup_headerbar(&self) {

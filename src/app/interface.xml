@@ -4,8 +4,8 @@
 
   <object class="GtkWindow" id="app_window">
     <property name="title" translatable="yes">Builder Basics</property>
-    <property name="default_height">400</property>
-    <property name="default_width">400</property>
+    <property name="default_height">500</property>
+    <property name="default_width">600</property>
 
     <child type="titlebar">
       <object class="GtkHeaderBar" id="app_headerbar">
@@ -17,9 +17,6 @@
           <object class="GtkBox">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
-            <style>
-              <class name="title-box" />
-            </style>
             <child>
               <object class="GtkImage" id="app_header_logo">
                 <property name="can_focus">False</property>
@@ -36,6 +33,9 @@
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="label" translatable="yes">Lurkmore</property>
+                <style>
+                  <class name="header-title-label" />
+                </style>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -75,6 +75,9 @@
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="orientation">vertical</property>
+                <style>
+                  <class name="sidebar" />
+                </style>
 
                 <child>
                   <object class="GtkLabel">
