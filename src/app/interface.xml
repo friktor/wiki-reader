@@ -72,18 +72,47 @@
             <property name="reveal_child">False</property>
             <child>
               <object class="GtkBox">
-                <property name="visible">True</property>
-                <property name="can_focus">False</property>
                 <property name="orientation">vertical</property>
-                <style>
-                  <class name="sidebar" />
-                </style>
+                <property name="can_focus">False</property>
+                <property name="visible">True</property>
+                <style><class name="sidebar" /></style>
 
                 <child>
-                  <object class="GtkLabel">
-                    <property name="visible">True</property>
+                  <object class="GtkBox" id="sidebar-header">
+                    <property name="orientation">vertical</property>
                     <property name="can_focus">False</property>
-                    <property name="label" translatable="yes">label</property>
+                    <property name="visible">True</property>
+                    <style><class name="sidebar-header" /></style>
+
+                    <child>
+                      <object class="GtkLabel">
+                        <property name="label" translatable="yes">Lurkmore</property>
+                        <property name="can_focus">False</property>
+                        <property name="visible">True</property>
+                        <style><class name="sidebar-header-search" /></style>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">True</property>
+                        <property name="position">0</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkEntry">
+                        <property name="placeholder" translatable="yes">Введите чтобы искать</property>
+                        <property name="activates-default">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="editable">True</property>
+                        <property name="visible">True</property>
+
+                        <style><class name="sidebar-header-search" /></style>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">True</property>
+                        <property name="position">1</property>
+                      </packing>
+                    </child>
                   </object>
                   <packing>
                     <property name="expand">False</property>
