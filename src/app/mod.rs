@@ -7,15 +7,15 @@ use self::gdk::{ Screen };
 use gtk::prelude::*;
 
 use gtk::{
-  Button, Image, Builder, Box, StyleContext,
-  Revealer, Settings, CssProvider,
+  Window, Button, Image, Builder, Box, StyleContext,
+  Revealer, Settings, CssProvider, HeaderBar
 };
 
 pub struct Application {
-  headerbar: gtk::HeaderBar,
-  settings: gtk::Settings,
-  builder: gtk::Builder,
-  window: gtk::Window
+  headerbar: HeaderBar,
+  settings: Settings,
+  builder: Builder,
+  window: Window
 }
 
 impl Application {

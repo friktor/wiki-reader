@@ -5,7 +5,7 @@
   <object class="GtkWindow" id="app_window">
     <property name="title" translatable="yes">Builder Basics</property>
     <property name="default_height">500</property>
-    <property name="default_width">600</property>
+    <property name="default_width">800</property>
 
     <child type="titlebar">
       <object class="GtkHeaderBar" id="app_headerbar">
@@ -69,7 +69,7 @@
             <property name="visible">True</property>
             <property name="can_focus">False</property>
             <property name="transition_type">slide-left</property>
-            <property name="reveal_child">False</property>
+            <property name="reveal_child">True</property>
             <child>
               <object class="GtkBox">
                 <property name="orientation">vertical</property>
@@ -89,7 +89,7 @@
                         <property name="label" translatable="yes">Lurkmore</property>
                         <property name="can_focus">False</property>
                         <property name="visible">True</property>
-                        <style><class name="sidebar-header-search" /></style>
+                        <style><class name="sidebar-header-label" /></style>
                       </object>
                       <packing>
                         <property name="expand">False</property>
@@ -99,7 +99,7 @@
                     </child>
                     <child>
                       <object class="GtkEntry">
-                        <property name="placeholder" translatable="yes">Введите чтобы искать</property>
+                        <property name="placeholder-text">Введите чтобы искать</property>
                         <property name="activates-default">True</property>
                         <property name="can_focus">True</property>
                         <property name="editable">True</property>
