@@ -9,7 +9,7 @@ use gtk::prelude::*;
 
 use gtk::{
   Window, Button, Image, Builder, Box, StyleContext,
-  Revealer, Settings, CssProvider, HeaderBar
+  Revealer, Settings, CssProvider, HeaderBar, RadioButton
 };
 
 pub struct Application {
@@ -89,6 +89,25 @@ impl Application {
       let path = format!("/org/gtk/Lurkmore/images/{}.png", &name);
       let image = Pixbuf::new_from_resource_at_scale(&path, 20, 20, false).unwrap();
       element.set_from_pixbuf(Some(&image));
+    }
+
+    // Radio handlers
+    let pages: [&str; 2] = ["home", "reader"];
+
+    for page in &pages {
+      let query = format!("btn-{}", &page);
+      let element: RadioButton = self.builder.get_object(&query).unwrap();
+      
+      let content_pages = self.pages.get_content().to_owned();
+      let current_page = page.clone();
+
+      element.connect_toggled(move |event| {
+        let is_active = event.get_active();
+        if is_active {
+          let page_query = format!("page_{}", &current_page);
+          content_pages.set_visible_child_name(&page_query);
+        }
+      });
     }
   }
 

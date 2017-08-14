@@ -13,6 +13,10 @@
   }
 }
 
+* {
+  font-family: "Noto Sans UI", sans-serif;
+}
+
 .sidebar.vertical {
   box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
   background-color: #f6f9fa;
@@ -24,32 +28,24 @@
   padding-right: 5px;
 }
 
+.sidebar-list {
+  padding: 20px 10px;
+}
+
 .sidebar-list-button {
-  transition: all 0.3s cubic-bezier(0, 0, 0.2, 1), box-shadow 0.2s cubic-bezier(0, 0, 0.2, 1), background-size 0.5s cubic-bezier(0, 0, 0.2, 1), background-image 1s cubic-bezier(0, 0, 0.2, 1);
-  background-image: radial-gradient(circle farthest-corner at center, transparent 10%, transparent 0%);
   background-color: transparent;
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: 1000% 1000%;
-  color: rgba(0, 0, 0, 0.62);
-  margin: 0 8px 0 0;
+  transition: all 0.3s ease-in;
+  color: rgba(0,0,0, 0.8);
+  padding: 8px 25px;
   border-radius: 0;
-  min-width: 35px;
-  outline: none;
-}
-
-.sidebar-list-button:hover, .sidebar-list-button:active {
-  background: transparent;
-  outline: none;
+  font-size: 16px;
   border: none;
+
+  border-top: 1px solid rgba(0,0,0, 0.05);
 }
 
-.sidebar-list-button:active {
-  transition: all 0.3s cubic-bezier(0, 0, 0.2, 1), background-size 0, background-image 0;
-  animation: ripple_effect 0.3s cubic-bezier(0, 0, 0.2, 1) forwards;
-  background-image: radial-gradient(circle farthest-corner at center, alpha(currentColor, 0.15) 10%, transparent 0%);
-  color: rgba(0, 0, 0, 0.87);
-}
+.sidebar-list-button:active { background-color: rgba(0,0,0, 0.3); border: none; }
+.sidebar-list-button:hover { background-color: rgba(0,0,0, 0.1); }
 
 .header-title-label {
   color: rgba(0,0,0, 0.75);
@@ -58,17 +54,17 @@
 
 .sidebar-header {
   box-shadow: inset 0 3px 6px rgba(0,0,0,0.22), 0 1px 2px rgba(0,0,0,0.34);
-  border-bottom: 5px solid #FFF;
   background-color: #FFFFFF;
   padding: 30px 25px;
   min-height: 120px;
 }
 
 .sidebar-header-label {
+  text-shadow: 2px 2px 2px rgba(0,0,0,0.15);
   color: rgba(0, 0, 0, 0.85);
   margin-top: 10px;
   font-weight: 300;
-  font-size: 25px;
+  font-size: 23px;
 }
 
 .app_headerbar {
@@ -104,7 +100,7 @@
 .headerbar-search {
   background-color: rgba(255,255,255, 0.2);
   transition: all 0.3s ease-in;
-  border-radius: 2px;
+  border-radius: 0px;
   margin: 0 15px;
 
   -gtk-secondary-caret-color: rgba(0,0,0, 0.8);
@@ -180,4 +176,15 @@
   color: rgba(0, 0, 0, 0.87);
   background-size: 0% 0%;
   border: none;
+}
+
+.app_headerbar_radio .image-button.radio GtkImage {
+  box-shadow: 0 3px 6px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+}
+
+.content-page {
+  box-shadow: 0 3px 6px rgba(0,0,0,0.22), 0 1px 2px rgba(0,0,0,0.34);
+  background-color: #FFFFFF;
+  padding: 15px;
+  margin: 10px;
 }

@@ -41,8 +41,8 @@ impl Pages {
   }
 
   pub fn prepare_stack(&self) {
-    self.stack.set_transition_type(gtk::StackTransitionType::OverDownUp);
-    self.stack.set_transition_duration(200);
+    self.stack.set_transition_type(gtk::StackTransitionType::OverRight);
+    self.stack.set_transition_duration(450);
     self.stack.set_hhomogeneous(true);
 
     self.stack.add_titled(&self.reader, "page_reader", "Reader");
