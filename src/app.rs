@@ -22,7 +22,7 @@ pub struct Application {
 
 impl Application {
   pub fn new() -> Application {
-    let builder = Builder::new_from_resource("/org/gtk/Lurkmore/ui/app.xml");
+    let builder = Builder::new_from_resource("/org/gtk/Lurkmore/c_ui/app.xml");
 
     // Default components
     let headerbar = builder.get_object("app_headerbar").unwrap();

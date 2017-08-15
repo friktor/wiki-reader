@@ -1,0 +1,61 @@
+doctype xml
+
+interface
+  requires lib="gtk+" version="3.20"/
+
+  object class="GtkBox" id="page_reader"
+    property name="orientation" vertical
+    property name="can_focus" False
+    property name="visible" True
+    style: class name="content-page"/
+
+    child
+      object class="GtkButton"
+        property name="label" translatable="yes" Page Reader
+        property name="receives_default" True
+        property name="can_focus" True
+        property name="visible" True
+        property name="relief" half
+
+      packing
+        property name="expand" False
+        property name="fill" True
+        property name="position" 0
+  
+  object class="GtkBox" id="page_about"
+    property name="orientation" vertical
+    property name="can_focus" False
+    property name="visible" True
+    style: class name="content-page"/
+
+    child
+      object class="GtkButton"
+        property name="label" translatable="yes" About Page
+        property name="receives_default" True
+        property name="can_focus" True
+        property name="visible" True
+        property name="relief" half
+
+      packing
+        property name="expand" False
+        property name="position" 0  
+        property name="fill" True
+  
+  object class="GtkBox" id="page_home"
+    property name="orientation" vertical
+    property name="can_focus" False
+    property name="visible" True
+    style: class name="content-page"/
+
+    child
+      object class="GtkButton"
+        property name="label" translatable="yes" HomePage
+        property name="receives_default" True
+        property name="can_focus" True
+        property name="visible" True
+        property name="relief" half
+
+      packing
+        property name="expand" False
+        property name="position" 0
+        property name="fill" True

@@ -1,0 +1,11 @@
+{
+  "name": "lmclient",
+  "version": "1.0.0",
+  "description": "Lurkmore client for desktop",
+  "main": "index.js",
+  "author": "Anton Shramko <antonshramko@yandex.ru>",
+  "license": "MIT",
+  "dependencies": {
+    "slm": "^1.0.0"
+  }
+}

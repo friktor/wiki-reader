@@ -4,3 +4,4 @@ Cargo.lock
 **/*.gresource
 /bundles/
 **/node_modules/
+**/c_ui/*.xml
