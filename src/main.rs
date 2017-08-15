@@ -8,7 +8,7 @@ use app::{ Application };
 use gio::{ Resource };
 
 pub fn load_resource() {
-  match Resource::load("./src/resources/resource.gresource") {
+  match Resource::load("./bundles/bundle.gresource") {
     Ok(resource) => { gio::resources_register(&resource) },
     Err(error) => { println!("{:?}", Error::description(&error)) }
   }

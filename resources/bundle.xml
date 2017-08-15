@@ -6,5 +6,8 @@
     <file>images/logo.png</file>
     <file>images/menu.png</file>
     <file>images/home.png</file>
+
+    <file compressed="true">ui/app.xml</file>
+    <file compressed="true">ui/pages.xml</file>
   </gresource>
 </gresources>

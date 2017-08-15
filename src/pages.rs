@@ -22,8 +22,7 @@ pub struct Pages {
 
 impl Pages {
   pub fn new() -> Pages {
-    let interface = include_str!("./ui/pages.xml");
-    let builder = Builder::new_from_string(interface);
+    let builder = Builder::new_from_resource("/org/gtk/Lurkmore/ui/pages.xml");
     let stack: Stack = Stack::new();
     
     let reader: Box = builder.get_object("page_reader").unwrap();

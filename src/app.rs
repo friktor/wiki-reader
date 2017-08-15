@@ -22,7 +22,7 @@ pub struct Application {
 
 impl Application {
   pub fn new() -> Application {
-    let builder = Builder::new_from_string(include_str!("./ui/app.xml"));
+    let builder = Builder::new_from_resource("/org/gtk/Lurkmore/ui/app.xml");
 
     // Default components
     let headerbar = builder.get_object("app_headerbar").unwrap();
@@ -47,10 +47,8 @@ impl Application {
     self.settings.set_property_gtk_theme_name(Some("Arc"));
 
     let screen = Screen::get_default().unwrap();
-    let style = include_str!("./ui/styles.css");
-    
     let provider = CssProvider::new();
-    provider.load_from_data(style).unwrap();
+    provider.load_from_path("./bundles/main.css").unwrap();
 
     StyleContext::add_provider_for_screen(
       &screen, &provider,
