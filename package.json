@@ -6,6 +6,6 @@
   "author": "Anton Shramko <antonshramko@yandex.ru>",
   "license": "MIT",
   "dependencies": {
-    "slm": "^1.0.0"
+    "pug": "^2.0.0-rc.3"
   }
 }

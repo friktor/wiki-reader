@@ -1,0 +1,26 @@
+doctype xml
+
+interface
+  requires(lib="gtk+" version="3.20")/
+
+  object(class="GtkWindow" id="app_window")
+    property(name="title" translatable="yes") Lurkmore
+    property(name="default_height") 500
+    property(name="default_width") 800
+
+    child(type="titlebar")
+      include headerbar.pug
+      
+    child
+      object(class="GtkBox" id="app_container")
+        style: class(name="container")/
+        property(name="can_focus") False
+        property(name="visible") True
+        
+        child
+          include sidebar.pug
+
+          packing
+            property(name="expand") False
+            property(name="fill") True
+            property(name="position") 0

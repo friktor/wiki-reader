@@ -1,21 +1,20 @@
-const slm = require("slm").__express
+const pug = require("pug")
 const fs = require("fs")
 
-let templates = ["app.slm", "pages.slm"]
+let templates = ["app.pug", "pages.pug"]
 let options = {}
 
 templates.forEach((template) => {
-  slm(`./resources/ui/${template}`, options, (error, rendered) => {
-    if (error) {
-      console.error(error)
-    }
-
-    fs.writeFile(`./resources/c_ui/${template.replace('.slm', '.xml')}`, rendered, {
-      encoding: 'utf-8'
-    }, (error, status) => {
-      if (error) {
-        console.error(error)
-      }
-    })
+  let fn = pug.compileFile(`./resources/ui/${template}`, {
+    basedir: __dirname+'/resources/ui',
+    pretty: true
   })
+
+  let outputName = template.replace('.pug', '.xml')
+
+  fs.writeFileSync(
+    `./resources/c_ui/${outputName}`,
+    fn(options),
+    { encoding: "utf-8" }
+  )
 })
