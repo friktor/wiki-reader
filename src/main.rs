@@ -1,5 +1,7 @@
 extern crate gio;
 extern crate gtk;
+
+mod reader;
 mod pages;
 mod app;
 
