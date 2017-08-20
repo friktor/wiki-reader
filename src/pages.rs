@@ -2,23 +2,28 @@ extern crate gdk_pixbuf;
 extern crate gtk;
 extern crate gdk;
 
+use std::cell::UnsafeCell;
+use std::rc::Rc;
+
 use gtk::{ Builder, Box, Stack };
 use reader::{ Reader };
 
 pub struct Pages {
+  pub reader: Rc<UnsafeCell<Reader>>,
   builder: Builder,
-  reader: Reader,
-  stack: Stack,
+  pub stack: Stack,
 
   page_about: Box,
   page_home: Box
 }
 
-fn get_prepared_reader(builder: &Builder) -> Reader {
+fn get_prepared_reader(builder: &Builder) -> Rc<UnsafeCell<Reader>> {
   let page_reader: Box = builder.get_object("page_reader").unwrap();
-  let reader = Reader::new();
-  reader.prepare_reader(page_reader);
-  return reader
+  let base = Reader::new();
+  base.prepare_reader(page_reader);
+
+  let reader = Rc::new(UnsafeCell::new(base));
+  return reader;
 }
 
 impl Pages {
@@ -42,15 +47,18 @@ impl Pages {
 
   pub fn prepare_stack(&self) {
     self.stack.set_transition_type(gtk::StackTransitionType::OverRight);
-    self.stack.set_transition_duration(450);
-    self.stack.set_hhomogeneous(true);
+    self.stack.set_transition_duration(200);
+    self.stack.set_homogeneous(true);
 
-    self.stack.add_titled(self.reader.get_content(), "page_reader", "Reader");
+    unsafe {
+      let reader = self.reader.get();
+      let content_reader = &(*reader).content;
+      self.stack.add_titled(content_reader, "page_reader", "Reader");
+    }
+
     self.stack.add_titled(&self.page_about, "page_about", "About");
     self.stack.add_titled(&self.page_home, "page_home", "Home");
-  }
 
-  pub fn get_content(&self) -> &Stack {
-    return &self.stack;
+    self.stack.set_visible_child_name("page_home");
   }
 }

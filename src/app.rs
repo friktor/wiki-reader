@@ -2,13 +2,19 @@ extern crate gdk_pixbuf;
 extern crate gtk;
 extern crate gdk;
 
+use std::collections::HashMap;
+use std::cell::UnsafeCell;
+use std::cell::Ref;
+use std::rc::Rc;
+
 use self::gdk_pixbuf::{ Pixbuf };
 use self::gdk::{ Screen };
+use reader::{ Reader };
 use pages::{ Pages };
 use gtk::prelude::*;
 
 use gtk::{
-  Window, Button, Image, Builder, Box, StyleContext,
+  Window, Button, Image, Builder, Box, StyleContext, Entry,
   Revealer, Settings, CssProvider, HeaderBar, RadioButton
 };
 
@@ -18,6 +24,15 @@ pub struct Application {
   builder: Builder,
   window: Window,
   pages: Pages
+}
+
+// WTF? Why 'unsafe'? Because i dont can connect to my content pointer without unsafe ref
+unsafe fn connect_search_activate(entry: Entry, reader: &Rc<UnsafeCell<Reader>>) {
+  let _reader = reader.get();
+  entry.connect_activate(move |event| {
+    let text = event.get_text().unwrap();
+    (*_reader).print_search(text);
+  });
 }
 
 impl Application {
@@ -74,8 +89,7 @@ impl Application {
 
   fn setup_content(&self) {
     let container: Box = self.builder.get_object("app_container").unwrap();
-    let content = self.pages.get_content();
-    container.pack_end(content, true, true, 0);
+    container.pack_end(&self.pages.stack, true, true, 0);
   }
 
   fn setup_headerbar(&self) {
@@ -96,7 +110,7 @@ impl Application {
       let query = format!("btn-{}", &page);
       let element: RadioButton = self.builder.get_object(&query).unwrap();
       
-      let content_pages = self.pages.get_content().to_owned();
+      let content_pages = self.pages.stack.to_owned();
       let current_page = page.clone();
 
       element.connect_toggled(move |event| {
@@ -106,6 +120,18 @@ impl Application {
           content_pages.set_visible_child_name(&page_query);
         }
       });
+    }
+  }
+
+  fn setup_search(&self) {
+    let entry = self.builder.get_object("search-input").unwrap();
+    let menu: HashMap<&str, RadioButton> = hashmap!{
+      "reader" => self.builder.get_object("btn-reader").unwrap(),
+      "home" => self.builder.get_object("btn-home").unwrap(),
+    };
+
+    unsafe {
+      connect_search_activate(entry, &self.pages.reader);
     }
   }
 
@@ -121,8 +147,9 @@ impl Application {
     self.setup_settings();
     self.setup_content();
     self.setup_sidebar();
-    self.register_quit();
+    self.setup_search();
 
+    self.register_quit();
     self.window.show_all();
     gtk::main();
   }

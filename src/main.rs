@@ -1,3 +1,5 @@
+#![feature(conservative_impl_trait)]
+#[macro_use] extern crate maplit;
 extern crate gio;
 extern crate gtk;
 

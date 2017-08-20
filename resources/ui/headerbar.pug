@@ -39,7 +39,7 @@ object(class="GtkHeaderBar" id="app_headerbar")
       child
         object(class="GtkButton" id="settings_button")
           property(name="receives_default") True
-          property(name="can_focus") False
+          property(name="can_focus") True
           property(name="visible") True
           style: class(name="menu-button")/
           
@@ -53,7 +53,7 @@ object(class="GtkHeaderBar" id="app_headerbar")
           property(name="position") 0
       
       child
-        object(class="GtkEntry")
+        object(class="GtkEntry" id="search-input")
           style: class(name="headerbar-search")/
           property(name="activates-default") True
           property(name="can_focus") True

@@ -8,7 +8,7 @@ use gtk::BoxExt;
 pub struct Reader {
   page_name: String,
   is_starter: bool,
-  content: Box
+  pub content: Box
 }
 
 impl Reader {
@@ -26,7 +26,7 @@ impl Reader {
     self.content.pack_start(&starter_page, true, true, 0);
   }
 
-  pub fn get_content(&self) -> &Box {
-    return &self.content;
+  pub fn print_search(&self, text: String) {
+    
   }
 }
