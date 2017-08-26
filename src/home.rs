@@ -8,27 +8,28 @@ use std::rc::Rc;
 use gtk::{ Builder, Box, Stack };
 use navigator::{ Page };
 
-pub struct Reader<'a> {
+pub struct Home<'a> {
   is_starter: bool,
   title: String,
   content: Box,
   name: &'a str
 }
 
-impl <'a>Reader<'a> {
-  pub fn new() -> Reader<'a> {
-    let content = Box::new(gtk::Orientation::Vertical, 0);
+impl <'a>Home<'a> {
+  pub fn new() -> Home<'a> {
+    let builder = Builder::new_from_resource("/org/gtk/Lurkmore/c_ui/home.xml");
+    let content: Box = builder.get_object("page_home").unwrap();
 
-    Reader {
-      title: String::from("Reader"),
-      name: "page_reader",
+    Home {
+      title: String::from("Home"),
+      name: "page_home",
       is_starter: true,
       content
     }
   }
 }
 
-impl <'a>Page for Reader<'a> {
+impl <'a>Page for Home<'a> {
   fn get_content(&self) -> &gtk::Box {
     &self.content
   }

@@ -9,5 +9,7 @@
 
     <file compressed="true">c_ui/app.xml</file>
     <file compressed="true">c_ui/pages.xml</file>
+    <file compressed="true">c_ui/headerbar.xml</file>
+    <file compressed="true">c_ui/home.xml</file>
   </gresource>
 </gresources>

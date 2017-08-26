@@ -7,10 +7,7 @@ interface
     property(name="title" translatable="yes") Lurkmore
     property(name="default_height") 500
     property(name="default_width") 800
-
-    child(type="titlebar")
-      include headerbar.pug
-      
+    
     child
       object(class="GtkBox" id="app_container")
         style: class(name="container")/

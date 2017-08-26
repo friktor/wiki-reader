@@ -1,7 +1,7 @@
 const pug = require("pug")
 const fs = require("fs")
 
-let templates = ["app.pug", "pages.pug"]
+let templates = ["app.pug", "pages.pug", "headerbar.pug", "home.pug"]
 let options = {}
 
 templates.forEach((template) => {

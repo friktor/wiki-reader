@@ -1,10 +1,13 @@
 #![feature(conservative_impl_trait)]
 #[macro_use] extern crate maplit;
+
 extern crate gio;
 extern crate gtk;
 
+mod navigator;
+mod headerbar;
 mod reader;
-mod pages;
+mod home;
 mod app;
 
 use std::error::{ Error };
@@ -20,12 +23,11 @@ pub fn load_resource() {
 
 fn main() {
   load_resource();
-
   if gtk::init().is_err() {
     println!("Failed to initialize GTK.");
     return;
   } else {
     let app = Application::new();
-    app.prepare_and_run();
+    app.run();
   }
 }
