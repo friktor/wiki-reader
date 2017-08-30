@@ -5,8 +5,8 @@ extern crate gdk;
 use std::cell::UnsafeCell;
 use std::rc::Rc;
 
+use navigator::{ Page, NavigatorEvent };
 use gtk::{ Builder, Box, Stack };
-use navigator::{ Page };
 
 pub struct Home<'a> {
   is_starter: bool,
@@ -40,5 +40,9 @@ impl <'a>Page for Home<'a> {
 
   fn get_title(&self) -> &str {
     &self.title[..]
+  }
+
+  fn on_receive_event(&self, event: NavigatorEvent) {
+    println!("handle event in home");
   }
 }

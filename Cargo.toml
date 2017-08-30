@@ -4,7 +4,9 @@ version = "0.1.0"
 authors = ["Anton Shramko <antonshramko@yandex.ru>"]
 
 [dependencies]
+serde_json = "1.0"
 gdk-pixbuf = "0.2"
+serde = "*"
 glib = "0.3"
 gio = "0.2"
 gdk = "0.6"

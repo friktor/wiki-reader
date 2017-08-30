@@ -7,15 +7,46 @@ interface
     property(name="orientation") vertical
     property(name="can_focus") True
     property(name="visible") True
-    style: class(name="content-page")/
+    style: class(name="home-page")/
 
     child
-      object(class="GtkButton")
-        property(name="label" translatable="yes") HomePage
-        property(name="receives_default") True
+      object(class="GtkBox")
         property(name="can_focus") True
         property(name="visible") True
-        property(name="relief") half
+        style: class(name="boxes")/
+
+        child
+          object(class="GtkBox")
+            property(name="orientation") vertical
+            property(name="can_focus") True
+            property(name="visible") True
+            style: class(name="card-box")/
+          packing
+            property(name="expand") True
+            property(name="position") 0
+            property(name="fill") True
+
+        child
+          object(class="GtkBox")
+            property(name="orientation") vertical
+            property(name="can_focus") True
+            property(name="visible") True
+            style: class(name="card-box")/
+          packing
+            property(name="expand") True
+            property(name="position") 1
+            property(name="fill") True
+
+        child
+          object(class="GtkBox")
+            property(name="orientation") vertical
+            property(name="can_focus") True
+            property(name="visible") True
+            style: class(name="card-box")/
+          packing
+            property(name="expand") True
+            property(name="position") 2
+            property(name="fill") True
 
       packing
         property(name="expand") False

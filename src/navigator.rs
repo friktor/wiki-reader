@@ -13,6 +13,7 @@ use gtk::{ Builder, Stack };
 use gtk::StackExt;
 
 pub trait Page {
+  fn on_receive_event(&self, event: NavigatorEvent);
   fn get_content(&self) -> &gtk::Box;
   fn get_title(&self) -> &str;
   fn get_name(&self) -> &str;
@@ -53,16 +54,23 @@ impl Navigator {
     }
   }
 
+  // @TODO: сделать вызов и исполнение асинхронным. Добавить автоматически слушатели из страниц
   pub fn register_listener<F: FnMut(NavigatorEvent)+'static>(&mut self, listener: F) {
     let cell = Rc::new(RefCell::new(listener));
     self.listeners.push(cell); 
   }
 
+  // @TODO: дать возможность страницам посылать эвенты навигатору.
   pub fn push_event(&mut self, event: NavigatorEvent) {
     for listener in self.listeners.iter() {
       let mut closure = listener.borrow_mut();
       let _e = event.clone();
       (&mut *closure)(_e);
+    }
+
+    for page in &self.pages {
+      let _e = event.clone();
+      page.on_receive_event(_e);
     }
   }
 
