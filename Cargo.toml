@@ -5,12 +5,17 @@ authors = ["Anton Shramko <antonshramko@yandex.ru>"]
 
 [dependencies]
 serde_json = "1.0"
-gdk-pixbuf = "0.2"
+matches = "0.1.6"
+serde_derive = "*"
 serde = "*"
+gdk-pixbuf = "0.2"
 glib = "0.3"
 gio = "0.2"
 gdk = "0.6"
 maplit = "*"
+hyper = "0.11"
+reqwest = "0.7"
+url = "1.2"
 
 [dependencies.gtk]
 version = "0.2"

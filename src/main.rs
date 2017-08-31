@@ -1,4 +1,6 @@
-#![feature(conservative_impl_trait)]
+#![feature(proc_macro, conservative_impl_trait, generators)]
+#[macro_use] extern crate serde_derive;
+#[macro_use] extern crate matches;
 #[macro_use] extern crate maplit;
 
 extern crate gio;
@@ -8,6 +10,7 @@ mod navigator;
 mod headerbar;
 mod reader;
 mod home;
+mod wiki;
 mod app;
 
 use std::error::{ Error };

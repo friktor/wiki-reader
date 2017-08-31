@@ -63,9 +63,10 @@ impl Application {
       let status = sidebar.get_reveal_child();
 
       match event {
+        NavigatorEvent::GetArticle(name) => {},
         NavigatorEvent::ToggleSidebar => {
           sidebar.set_reveal_child(!status);
-        }
+        },
       }
     });
   }

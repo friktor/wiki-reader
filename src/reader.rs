@@ -6,6 +6,7 @@ use std::cell::UnsafeCell;
 use std::rc::Rc;
 
 use navigator::{ Page, NavigatorEvent };
+use wiki::{ get_article_by_name };
 use gtk::{ Builder, Box, Stack };
 
 pub struct Reader<'a> {
@@ -28,6 +29,12 @@ impl <'a>Reader<'a> {
   }
 }
 
+impl <'a>Reader<'a> {
+  fn get_article(&self, name: String) {
+    println!("search for {}", &name);
+  }
+}
+
 impl <'a>Page for Reader<'a> {
   fn get_content(&self) -> &gtk::Box {
     &self.content
@@ -42,6 +49,9 @@ impl <'a>Page for Reader<'a> {
   }
 
   fn on_receive_event(&self, event: NavigatorEvent) {
-    println!("handle event in reader");
+    match event {
+      NavigatorEvent::GetArticle(name) => self.get_article(name),
+      NavigatorEvent::ToggleSidebar => {},
+    }
   }
 }

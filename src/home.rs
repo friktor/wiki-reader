@@ -43,6 +43,6 @@ impl <'a>Page for Home<'a> {
   }
 
   fn on_receive_event(&self, event: NavigatorEvent) {
-    println!("handle event in home");
+    
   }
 }

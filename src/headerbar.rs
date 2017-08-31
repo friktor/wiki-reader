@@ -84,9 +84,22 @@ impl AppHeaderBar {
     });
   }
 
+  fn setup_search(&self, navigator: &Rc<UnsafeCell<Navigator>>) {
+    use gtk::EntryExt;
+    let nav = navigator.get();
+
+    self.search.connect_activate(move |event| {
+      let value = event.get_text().unwrap();
+      unsafe {
+        (*nav).push_event(NavigatorEvent::GetArticle(value))
+      }
+    });
+  }
+
   pub fn setup(&self, navigator: &Rc<UnsafeCell<Navigator>>) {
     self.setup_toggle_sidebar(navigator);
     self.setup_routing(navigator);
+    self.setup_search(navigator);
     self.setup_icons();
   }
 

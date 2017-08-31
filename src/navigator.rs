@@ -27,7 +27,8 @@ pub struct Navigator {
 
 #[derive(Clone)]
 pub enum NavigatorEvent {
-  ToggleSidebar
+  GetArticle(String),
+  ToggleSidebar,
 }
 
 impl Navigator {
