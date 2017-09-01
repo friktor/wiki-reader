@@ -4,11 +4,13 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "nexe -i ./index.js -o ./cli"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "wtf_wikipedia": "^1.0.1"
+    "atob": "^2.0.3",
+    "wtf_wikipedia": "^1.0.1",
+    "yargs": "^8.0.2"
   }
 }

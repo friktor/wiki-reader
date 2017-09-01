@@ -5,3 +5,4 @@ Cargo.lock
 /bundles/
 **/node_modules/
 **/c_ui/*.xml
+**/.nexe/

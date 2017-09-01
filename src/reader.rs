@@ -1,3 +1,4 @@
+extern crate serde_json;
 extern crate gdk_pixbuf;
 extern crate gtk;
 extern crate gdk;
@@ -5,8 +6,9 @@ extern crate gdk;
 use std::cell::UnsafeCell;
 use std::rc::Rc;
 
+use wiki::{ get_article_by_name, Article };
 use navigator::{ Page, NavigatorEvent };
-use wiki::{ get_article_by_name };
+use self::serde_json::{ Value };
 use gtk::{ Builder, Box, Stack };
 
 pub struct Reader<'a> {
@@ -31,7 +33,10 @@ impl <'a>Reader<'a> {
 
 impl <'a>Reader<'a> {
   fn get_article(&self, name: String) {
-    println!("search for {}", &name);
+    let result = get_article_by_name(name.clone());
+    
+    println!("search for: {}", &name);
+    println!("content: {}", &result.content);
   }
 }
 

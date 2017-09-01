@@ -1,8 +1,10 @@
-#![feature(proc_macro, conservative_impl_trait, generators)]
+#![feature(proc_macro, conservative_impl_trait, generators, rustc_private)]
 #[macro_use] extern crate serde_derive;
 #[macro_use] extern crate matches;
 #[macro_use] extern crate maplit;
+#[macro_use] extern crate log;
 
+extern crate env_logger;
 extern crate gio;
 extern crate gtk;
 
@@ -16,6 +18,7 @@ mod app;
 use std::error::{ Error };
 use app::{ Application };
 use gio::{ Resource };
+use std::env;
 
 pub fn load_resource() {
   match Resource::load("./bundles/bundle.gresource") {
@@ -25,7 +28,11 @@ pub fn load_resource() {
 }
 
 fn main() {
+  env_logger::init().unwrap();
   load_resource();
+
+  println!("{}", env::current_dir().unwrap().display());
+
   if gtk::init().is_err() {
     println!("Failed to initialize GTK.");
     return;
