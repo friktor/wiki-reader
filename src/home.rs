@@ -5,7 +5,7 @@ extern crate gdk;
 use std::cell::UnsafeCell;
 use std::rc::Rc;
 
-use navigator::{ Page, NavigatorEvent };
+use navigator::{ Page, NavigatorEvent, NavigatorStateMachine };
 use gtk::{ Builder, Box, Stack };
 
 pub struct Home<'a> {
@@ -16,7 +16,7 @@ pub struct Home<'a> {
 }
 
 impl <'a>Home<'a> {
-  pub fn new() -> Home<'a> {
+  pub fn new(events: &Rc<UnsafeCell<NavigatorStateMachine>>) -> Home<'a> {
     let builder = Builder::new_from_resource("/org/gtk/Lurkmore/c_ui/home.xml");
     let content: Box = builder.get_object("page_home").unwrap();
 

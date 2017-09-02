@@ -52,9 +52,10 @@ impl Application {
     (*nav_ref).setup();
 
     let container: gtk::Box = self.builder.get_object("app_container").unwrap();
+    let stack = (*nav_ref).stack.get();
     
     // Add navigator block to window
-    container.pack_end(&(*nav_ref).stack, true, true, 0);
+    container.pack_end(&*stack, true, true, 0);
 
     // Listener event toogle
     let builder = self.builder.clone();
@@ -63,10 +64,10 @@ impl Application {
       let status = sidebar.get_reveal_child();
 
       match event {
-        NavigatorEvent::GetArticle(name) => {},
         NavigatorEvent::ToggleSidebar => {
           sidebar.set_reveal_child(!status);
         },
+        _ => {}
       }
     });
   }

@@ -14,3 +14,11 @@ http://lurkmore.to/api.php
   &format=json
   &page=Вещества
   &utf8=1
+
+#### Image info
+http://lurkmore.to/api.php
+  ?action=query
+  &titles=File:Ment%202.jpg
+  &prop=imageinfo
+  &format=json
+  &iiprop=timestamp|user|url

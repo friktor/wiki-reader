@@ -33,6 +33,7 @@ fn format_request(params: HashMap<&str, &str>) -> Url {
   Url::parse(&req_url[..]).unwrap()
 }
 
+#[derive(Clone)]
 pub struct Article {
   pub content: Value,
   pub success: bool
@@ -108,7 +109,6 @@ pub fn get_article_ast(content: Value, title: &str) -> Result<Value, ()> {
   return result;
 }
 
-// Simple sync implementation
 pub fn get_article_by_name(name: String) -> Article {
   let title = &name[..];
 

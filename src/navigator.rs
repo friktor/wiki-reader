@@ -19,20 +19,46 @@ pub trait Page {
   fn get_name(&self) -> &str;
 }
 
-pub struct Navigator {
-  listeners: Vec<Rc<RefCell<FnMut(NavigatorEvent)>>>,
-  pages: Vec<Box<Page>>,
-  pub stack: Stack,
-}
-
 #[derive(Clone)]
 pub enum NavigatorEvent {
   GetArticle(String),
+  OpenPage(String),
   ToggleSidebar,
+}
+
+pub struct NavigatorStateMachine {
+  listeners: Vec<Rc<RefCell<FnMut(NavigatorEvent)>>>,
+}
+
+impl NavigatorStateMachine {
+  fn new() -> NavigatorStateMachine {
+    NavigatorStateMachine { listeners: Vec::new() }
+  }
+
+  pub fn register_listener<F: FnMut(NavigatorEvent)+'static>(&mut self, listener: F) {
+    let cell = Rc::new(RefCell::new(listener));
+    self.listeners.push(cell); 
+  }
+
+  pub fn push_event(&mut self, event: NavigatorEvent) {
+    for listener in self.listeners.iter() {
+      let mut closure = listener.borrow_mut();
+      let _e = event.clone();
+      (&mut *closure)(_e);
+    }
+  }
+}
+
+pub struct Navigator {
+  events: Rc<UnsafeCell<NavigatorStateMachine>>,
+  pub stack: Rc<UnsafeCell<Stack>>,
+  pages: Vec<Box<Page>>,
 }
 
 impl Navigator {
   pub fn new() -> Navigator {
+    let events = Rc::new(UnsafeCell::new(NavigatorStateMachine::new()));
+
     // Stack with options
     let stack: Stack = Stack::new();
     stack.set_transition_type(gtk::StackTransitionType::OverRight);
@@ -40,8 +66,8 @@ impl Navigator {
     stack.set_homogeneous(true);
 
     // Page blocks
-    let reader = Reader::new();
-    let home = Home::new();
+    let reader = Reader::new(&events);
+    let home = Home::new(&events);
 
     let pages: Vec<Box<Page>> = vec![
       Box::new(reader),
@@ -49,25 +75,21 @@ impl Navigator {
     ];
 
     Navigator {
-      listeners: Vec::new(),
+      stack: Rc::new(UnsafeCell::new(stack)),
+      events,
       pages,
-      stack
     }
   }
 
-  // @TODO: сделать вызов и исполнение асинхронным. Добавить автоматически слушатели из страниц
   pub fn register_listener<F: FnMut(NavigatorEvent)+'static>(&mut self, listener: F) {
-    let cell = Rc::new(RefCell::new(listener));
-    self.listeners.push(cell); 
+    let events = self.events.get();
+    unsafe { (*events).register_listener(listener) }
   }
 
-  // @TODO: дать возможность страницам посылать эвенты навигатору.
   pub fn push_event(&mut self, event: NavigatorEvent) {
-    for listener in self.listeners.iter() {
-      let mut closure = listener.borrow_mut();
-      let _e = event.clone();
-      (&mut *closure)(_e);
-    }
+    let events = self.events.get();
+
+    unsafe { (*events).push_event(event.clone()) }
 
     for page in &self.pages {
       let _e = event.clone();
@@ -75,19 +97,39 @@ impl Navigator {
     }
   }
 
+  pub fn register_navigator_listener(&self) {
+    let events = self.events.get();
+    let stack = self.stack.get();
+    
+    unsafe {
+      (*events).register_listener(move |event| {
+        match event {
+          NavigatorEvent::OpenPage(name) => {
+            (*stack).set_visible_child_name(&name[..])
+          },
+          _ => {}
+        }        
+      })
+    }
+  }
+
   pub fn setup(&self) {
+    let stack = self.stack.get();
+
     for page in &self.pages {
       let content = page.get_content();
       let title = page.get_title();
       let name = page.get_name();
 
-      self.stack.add_titled(content, name, title);
+      unsafe { (*stack).add_titled(content, name, title) }
     }
 
-    self.stack.set_visible_child_name("page_home");
+    unsafe { (*stack).set_visible_child_name("page_home") }
+    self.register_navigator_listener();
   }
 
   pub fn open(&self, page: String) {
-    self.stack.set_visible_child_name(&page[..]);
+    let stack = self.stack.get();
+    unsafe { (*stack).set_visible_child_name(&page[..]) }
   }
 }
