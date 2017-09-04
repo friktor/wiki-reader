@@ -33,9 +33,9 @@ impl <'a>Reader<'a> {
 
     Reader {
       title: String::from("Reader"),
-      name: "page_reader",
       is_starter: true,
       events: _events,
+      name: "reader",
       content,
     }
   }
@@ -63,7 +63,7 @@ impl <'a>Reader<'a> {
     self.content.show_all();
     
     let events = self.events.get();
-    let page = NavigatorEvent::OpenPage(String::from("page_reader"));
+    let page = NavigatorEvent::OpenPage(String::from("reader"));
     unsafe { (*events).push_event(page) }
   }
 

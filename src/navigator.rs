@@ -124,7 +124,7 @@ impl Navigator {
       unsafe { (*stack).add_titled(content, name, title) }
     }
 
-    unsafe { (*stack).set_visible_child_name("page_home") }
+    unsafe { (*stack).set_visible_child_name("home") }
     self.register_navigator_listener();
   }
 

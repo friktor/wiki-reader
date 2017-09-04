@@ -22,8 +22,8 @@ impl <'a>Home<'a> {
 
     Home {
       title: String::from("Home"),
-      name: "page_home",
       is_starter: true,
+      name: "home",
       content
     }
   }

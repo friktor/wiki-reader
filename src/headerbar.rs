@@ -13,7 +13,6 @@ use self::gdk_pixbuf::{ Pixbuf };
 use gtk::ImageExt;
 
 pub struct AppHeaderBar {
-  menu: HashMap<String, RadioButton>,
   headerbar: HeaderBar,
   builder: Builder,
   search: Entry
@@ -25,34 +24,28 @@ impl AppHeaderBar {
     let headerbar: HeaderBar = builder.get_object("app_headerbar").unwrap();
     let search: Entry = builder.get_object("search_input").unwrap();
 
-    let menu: HashMap<String, RadioButton> = hashmap!{
-      String::from("reader") => builder.get_object("btn-reader").unwrap(),
-      String::from("home") => builder.get_object("btn-home").unwrap(),
-    };
-
     AppHeaderBar {
       headerbar,
       builder,
-      search,
-      menu
+      search
     }
   }
 
   // connect toggles button to navigator
   fn setup_routing(&self, navigator: &Rc<UnsafeCell<Navigator>>) {
     use gtk::ToggleButtonExt;
+    let pages = ["home", "reader"];
+    let nav = navigator.get();
 
-    for (name, button) in &self.menu {
-      let current_page = name.clone();
-      let nav = navigator.get();
+    for name in &pages {
+      let page = name.clone();
+      let btn_query = format!("btn-{}", &page);
+      let button: RadioButton = self.builder.get_object(&btn_query[..]).unwrap();
 
-      button.connect_toggled(move |event| {
-        let is_active = event.get_active();
-        let page_name = &current_page[..];
-        if is_active {
-          let page_query = format!("page_{}", page_name);
-          unsafe { (*nav).open(page_query); }
-        }
+      button.connect_toggled(move |event| {        
+        if event.get_active() {unsafe {
+          (*nav).open(String::from(page));
+        }}
       });
     }
   }
@@ -96,8 +89,33 @@ impl AppHeaderBar {
     });
   }
 
+  pub fn subscribe_event(&self, navigator: &Rc<UnsafeCell<Navigator>>) {
+    use gtk::ToggleButtonExt;
+    let builder = self.builder.clone();
+    let nav = navigator.get();
+    
+    unsafe {(*nav).register_listener(move |event| {
+      println!("receive event from headerbar");
+
+      match event {
+        NavigatorEvent::OpenPage(p) => {
+          let page = &p[..];
+          let btn_query = format!("btn-{}", &page);
+          println!("change toggle to: {}", &page);
+
+          if page == "home" || page == "reader" {
+            let button: RadioButton = builder.get_object(&btn_query[..]).unwrap();
+            button.set_active(true);
+          }
+        },
+        _ => {}
+      }
+    })}
+  }
+
   pub fn setup(&self, navigator: &Rc<UnsafeCell<Navigator>>) {
     self.setup_toggle_sidebar(navigator);
+    self.subscribe_event(navigator);
     self.setup_routing(navigator);
     self.setup_search(navigator);
     self.setup_icons();
