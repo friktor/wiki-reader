@@ -2,37 +2,30 @@ extern crate gdk_pixbuf;
 extern crate gtk;
 extern crate gdk;
 
+use components::headerbar::AppHeaderBar;
+use utils::navigator::Navigator;
+use utils::traits::{ Event };
 use std::cell::UnsafeCell;
 use std::rc::Rc;
 
-use navigator::{ Navigator, NavigatorEvent };
-use headerbar::{ AppHeaderBar };
-
-use self::gdk_pixbuf::{ Pixbuf };
 use self::gdk::{ Screen };
 use gtk::prelude::*;
-
-use gtk::{
-  Window, Button, Image, Builder, Box, StyleContext, Entry,
-  Revealer, Settings, CssProvider, HeaderBar, RadioButton
-};
 
 pub struct Application {
   navigator: Rc<UnsafeCell<Navigator>>,
   headerbar: AppHeaderBar,
-  settings: Settings,
-  builder: Builder,
-  window: Window,
+  settings: gtk::Settings,
+  builder: gtk::Builder,
+  window: gtk::Window,
 }
 
 impl Application {
   pub fn new() -> Application {
     // Setup&get containers
-    let builder = Builder::new_from_resource("/org/gtk/Lurkmore/c_ui/app.xml");
-    let window = builder.get_object("app_window").unwrap();
-    let settings = Settings::get_default().unwrap();
-    
-    // Make navigator
+    let builder = gtk::Builder::new_from_resource("/org/gtk/Lurkmore/c_ui/app.xml");
+    let window: gtk::Window = builder.get_object("app_window").unwrap();
+    let settings = gtk::Settings::get_default().unwrap();
+
     let navigator = Rc::new(UnsafeCell::new(Navigator::new()));
     let headerbar = AppHeaderBar::new();
     headerbar.setup(&navigator);
@@ -48,25 +41,21 @@ impl Application {
   }
 
   unsafe fn setup_navigator(&self) {
-    let nav_ref = self.navigator.get();
-    (*nav_ref).setup();
+    let builder = self.builder.clone();
+    let navigator_ref = self.navigator.get();
+    (*navigator_ref).setup();
+    let events = (*navigator_ref).get_events().get();
 
     let container: gtk::Box = self.builder.get_object("app_container").unwrap();
-    let stack = (*nav_ref).stack.get();
-    
-    // Add navigator block to window
+    let stack = (*navigator_ref).stack.get();
     container.pack_end(&*stack, true, true, 0);
 
-    // Listener event toogle
-    let builder = self.builder.clone();
-    (*nav_ref).register_listener(move |event| {
-      let sidebar: Revealer = builder.get_object("sidebar").unwrap();
+    (*events).subscribe(move |event| {
+      let sidebar: gtk::Revealer = builder.get_object("sidebar").unwrap();
       let status = sidebar.get_reveal_child();
 
       match event {
-        NavigatorEvent::ToggleSidebar => {
-          sidebar.set_reveal_child(!status);
-        },
+        Event::ToggleSidebar => sidebar.set_reveal_child(!status),
         _ => {}
       }
     });
@@ -79,13 +68,13 @@ impl Application {
 
   fn setup_settings(&self) {
     self.settings.set_property_gtk_enable_animations(true);
-    self.settings.set_property_gtk_theme_name(Some("Arc"));
+    self.settings.set_property_gtk_theme_name(Some("Arc-Dark"));
 
     let screen = Screen::get_default().unwrap();
-    let provider = CssProvider::new();
+    let provider = gtk::CssProvider::new();
     provider.load_from_path("./bundles/main.css").unwrap();
 
-    StyleContext::add_provider_for_screen(
+    gtk::StyleContext::add_provider_for_screen(
       &screen, &provider,
       gtk::STYLE_PROVIDER_PRIORITY_APPLICATION
     );
