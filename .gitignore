@@ -6,3 +6,4 @@ Cargo.lock
 **/node_modules/
 **/c_ui/*.xml
 **/.nexe/
+**/wiki-parser/env/
