@@ -5,7 +5,7 @@ use std::cell::UnsafeCell;
 use std::rc::Rc;
 
 use utils::navigator::{ Navigator, EventEmitter };
-use utils::wiki::{ get_article_by_name, Article };
+use utils::wiki::{ Article, ErrorReason };
 use utils::traits::{ View, Event };
 use self::serde_json::Value;
 
@@ -40,21 +40,23 @@ impl <'a>Reader<'a> {
     for child in childs {
       self.content.remove(&child);
     }
-
-    println!("Clean old reader content");
   }
 
   fn get_article(&self, name: String) {
     use gtk::WidgetExt;
     use gtk::BoxExt;
 
-    let article = get_article_by_name(name.clone());
-    let nodes = self.get_nodes(article.clone(), name.clone());
-    println!("search for: {} \n {}", &name, &article.content);
-    
-    self.clear_content();
-    self.content.pack_start(&nodes, false, true, 0);
-    self.content.show_all();
+    // Next need add error handle
+    match Article::new_from_title(name.clone()) {
+      Err(_) => {},
+      Ok(article) => {
+        let nodes = self.get_nodes(article, name.clone());
+        
+        self.clear_content();
+        self.content.pack_start(&nodes, false, true, 0);
+        self.content.show_all();
+      }
+    }
     
     // let events = self.events.get();
     // let page = Event::OpenPage(String::from("reader"));
@@ -101,20 +103,13 @@ impl <'a>Reader<'a> {
     use gtk::BoxExt;
 
     let container = gtk::Box::new(gtk::Orientation::Vertical, 0);
-    let res_type = article.content["type"].as_str().unwrap();
-
+    
     let article_title = gtk::Label::new(&title[..]);
     let title_context = article_title.get_style_context().unwrap();
     title_context.add_class("page-title");
     
     container.pack_start(&article_title, false, true, 0);
-
-    match res_type {
-      "disambiguation" => self.disambiguation_content(&container, &article.content),
-      "page" => self.page_content(&container, &article.content),
-      _ => {}
-    }
-
+    self.page_content(&container, &article.content);
     container
   }
 }

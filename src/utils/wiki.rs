@@ -3,144 +3,160 @@ extern crate reqwest;
 extern crate url;
 
 use self::serde_json::{ Value, from_str as json_from_str };
+use std::process::{Command, Stdio};
 use std::collections::HashMap;
+use std::io::prelude::*;
 use self::reqwest::get;
+use std::error::Error;
 use self::url::Url;
 
-use std::io::prelude::*;
-use std::fs::{ File, remove_file };
-use std::process::Command;
-use std::error::Error;
-use std::path::Path;
-use std::env;
+#[derive(Clone)]
+pub enum ErrorReason {
+  formatting,
+  request,
+  parsing,
+}
 
-fn format_request(params: HashMap<&str, &str>) -> Url {
-  let mut req_url = String::from("http://lurkmore.to/api.php");
-  let mut is_first = true;
-
-  for (param, value) in &params {
-    if is_first {
-      req_url.push_str("?");
-      is_first = false;
-    } else {
-      req_url.push_str("&");
-    }
-
-    let formatted = format!("{}={}", param, value);
-    req_url.push_str(&formatted[..]);
-  }
-
-  Url::parse(&req_url[..]).unwrap()
+#[derive(Clone)]
+pub enum WikiResource {
+  Wikipedia,
+  Lurkmore
 }
 
 #[derive(Clone)]
 pub struct Article {
+  pub wikicode: String,
   pub content: Value,
-  pub success: bool
+  pub title: String,
+  pub page_id: i64,
 }
 
-fn write_json_to_cache(content: &Value, title: &str) -> String {
-  use std::io::Write;
-
-  let _cdir = env::current_dir().unwrap();
-  let current_dir = _cdir.to_str().unwrap();
-
-  let content_json = format!("{}", content);
-  let file_path = format!("{}/cache/{}.json", &current_dir, &title);
-
-  let fcp = file_path.clone();
-  let path = Path::new(&fcp);
-  
-  let mut file = match File::create(&path) {
-    Err(why) => panic!("couldn't create {}: {}", path.display(), why.description()),
-    Ok(file) => file,
-  };
-
-  println!("write cache file to: {}, is exists - {}", 
-    &path.display(),
-    &path.exists()
-  );
-
-  match file.write_all(content_json.as_bytes()) {
-    Err(why) => panic!("error in write file content: {}", &why.description()),
-    Ok(()) => println!("success create file")
-  };
-
-  return file_path;
-}
-
-pub fn get_article_ast(content: Value, title: &str) -> Result<Value, ()> {
-  let file_path = write_json_to_cache(&content, &title);
-  
-  let _cdir = env::current_dir().unwrap();
-  let current_dir = _cdir.to_str().unwrap();
-
-  let command = Command::new("./cli")
-    .current_dir(format!("{}/cli-parser", &current_dir))
-    .arg(&file_path)
-    .output();
-
-  let result = match command {
-    Ok(out) => {
-      let dirty_output = String::from_utf8_lossy(&out.stdout);
-      let output = format!("{}", dirty_output);
-
-      match json_from_str(&output[..]) {
-        Ok(json) => Ok(json),
-        Err(error) => {
-          println!("error parsing json: {}", error.description());
-          Err(())
-        }
-      }
-    },
-
-    Err(error) => {
-      println!("error execute command: {}", error.description());
-      Err(())
+impl Article {
+  pub fn new_from_title(title: String) -> Result<Article, ErrorReason> {
+    match Article::get_article_by_title(title, WikiResource::Lurkmore) {
+      Ok(mut response) => Article::normalize_response(response),
+      Err(reason) => Err(reason)
     }
-  };
-
-  let path = Path::new(&file_path);
-  match remove_file(&path) {
-    Err(why) => panic!("couldn't remove file {}: {}", &why.description(), &path.display()),
-    Ok(()) => println!("file success removed")
   }
 
-  return result;
-}
+  fn get_article_by_title(title: String, resource: WikiResource) -> Result<Value, ErrorReason> {
+    let url = Article::generate_url(resource, hashmap!{
+      "action" => "query",
+      "titles" => &title[..],
+      "prop"   => "revisions",
+      "rvprop" => "content",
+      "format" => "json",
+    });
 
-pub fn get_article_by_name(name: String) -> Article {
-  let title = &name[..];
+    let request = get(url);
 
-  let params: HashMap<&str, &str> = hashmap!{
-    "action" => "query",
-    "titles" => title,
-    "prop"   => "revisions",
-    "rvprop" => "content",
-    "format" => "json",
-  };
+    match request {
+      Ok(mut response) => {
+        let json = response.json();
+        match json {
+          Err(error) => Err(ErrorReason::parsing),
+          Ok(tree) => Ok(tree)
+        }
+      },
 
-  let formatted = format_request(params);
-  let r = get(formatted);
-
-  if r.is_ok() {
-    let mut response = r.unwrap();
-    let url = response.url().clone();
-
-    if response.status().is_success() {
-      println!("{}", url.into_string());
-      let res_content: Value = response.json().unwrap();
-      // TODO: handle error in this parsing scope
-      let content = get_article_ast(res_content, title).unwrap();
-      
-      Article {
-        content: content,
-        success: true
+      Err(error) => {
+        println!("Error: {}", error.description());
+        Err(ErrorReason::request)
       }
-    } else {
-      Article { success: false, content: Value::Null }
     }
-  } else {
-    Article { success: false, content: Value::Null }
+  }
+
+  fn normalize_response(response: Value) -> Result<Article, ErrorReason> {
+    let pages = &response["query"]["pages"];
+    
+    if !pages.is_object() {
+      return Err(ErrorReason::formatting)
+    }
+
+    let object = pages.as_object().unwrap();
+    let negative_key = String::from("-1");
+
+    if object.is_empty() || object.contains_key(&negative_key) {
+      return Err(ErrorReason::parsing)
+    }
+
+    let mut wikicode = String::new();
+    let mut title = String::new();
+    let mut page_id: i64 = -1;
+    
+    for (key, value) in object.iter() {
+      let s = value["revisions"][0]["*"].as_str().unwrap();
+      let t = value["title"].as_str().unwrap();
+      
+      page_id = value["pageid"].as_i64().unwrap();
+      wikicode.push_str(s);
+      title.push_str(t);
+      break;
+    }
+
+    let result = match Article::get_wikicode_ast(wikicode.clone()) {
+      Err(reason) => return Err(reason),
+      Ok(ast) => Article {
+        content: ast,
+        wikicode,
+        page_id,
+        title
+      }
+    };
+
+    return Ok(result);
+  }
+
+  pub fn get_wikicode_ast(code: String) -> Result<Value, ErrorReason> {
+    let command = format!("./wiki-parser/main.py");
+
+    let process = match Command::new(&command[..])
+      .stdin(Stdio::piped())
+      .stdout(Stdio::piped())
+      .spawn() {
+        Err(why) => panic!("couldn't spawn wiki-parser: {}", why.description()),
+        Ok(process) => process,
+    };
+
+    match process.stdin.unwrap().write_all(code.as_bytes()) {
+      Err(error) => return Err(ErrorReason::parsing),
+      Ok(_) => {}
+    }
+
+    let mut dirty_ast = String::new();
+    match process.stdout.unwrap().read_to_string(&mut dirty_ast) {
+      Err(why) => return Err(ErrorReason::parsing),
+      Ok(_) => {} 
+    }
+
+    match json_from_str(&dirty_ast[..]) {
+      Err(error) => Err(ErrorReason::parsing),
+      Ok(ast) => Ok(ast)
+    }
+  }
+
+  fn generate_url(resource: WikiResource, params: HashMap<&str, &str>) -> Url {
+    let mut params_url = String::new();
+    let mut is_first = true;
+
+    let host = match resource {
+      WikiResource::Wikipedia => "https://ru.wikipedia.org/w/api.php",
+      WikiResource::Lurkmore => "http://lurkmore.to/api.php"
+    };
+
+    for (param, value) in &params {
+      if is_first {
+        params_url.push_str("?");
+        is_first = false;
+      } else {
+        params_url.push_str("&");
+      }
+
+      let formatted = format!("{}={}", param, value);
+      params_url.push_str(&formatted[..]);
+    }
+
+    let url = format!("{}{}", &host, &params_url);
+    Url::parse(&url[..]).unwrap()
   }
 }
