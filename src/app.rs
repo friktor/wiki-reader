@@ -62,8 +62,8 @@ impl Application {
   }
 
   fn setup_headerbar(&self) {
-    let headerbar = self.headerbar.get_content();
-    self.window.set_titlebar(headerbar);
+    let headerbar = self.headerbar.get_content().get();
+    unsafe { self.window.set_titlebar(&*headerbar) }
   }
 
   fn setup_settings(&self) {

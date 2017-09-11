@@ -9,7 +9,7 @@ use std::rc::Rc;
 use self::gdk_pixbuf::{ Pixbuf };
 
 pub struct AppHeaderBar {
-  headerbar: gtk::HeaderBar,
+  headerbar: Rc<UnsafeCell<gtk::HeaderBar>>,
   builder: gtk::Builder,
   search: gtk::Entry
 }
@@ -21,37 +21,16 @@ impl AppHeaderBar {
     let search: gtk::Entry = builder.get_object("search_input").unwrap();
 
     AppHeaderBar {
-      headerbar,
+      headerbar: Rc::new(UnsafeCell::new(headerbar)),
       builder,
       search
-    }
-  }
-
-  // connect toggles button to navigator
-  unsafe fn setup_routing(&self, navigator: &Rc<UnsafeCell<Navigator>>) {
-    use gtk::ToggleButtonExt;
-
-    let pages = ["home", "reader"];
-    let navigator_ref = navigator.get();
-    let events = (*navigator_ref).get_events().get();
-
-    for name in &pages {
-      let page = name.clone();
-      let btn_query = format!("btn-{}", &page);
-      let button: gtk::RadioButton = self.builder.get_object(&btn_query[..]).unwrap();
-
-      button.connect_toggled(move |event| {        
-        if event.get_active() {
-          (*events).push(Event::OpenPage(String::from(page)));
-        }
-      });
     }
   }
 
   // Set icons in ui
   fn setup_icons(&self) {
     use gtk::ImageExt;
-    let icons: [&str; 4] = ["home", "reader", "menu", "search"];
+    let icons: [&str; 2] = ["menu", "search"]; // "home", "reader", 
     
     for name in &icons {
       let query = format!("btn-{}-image", &name);
@@ -88,41 +67,46 @@ impl AppHeaderBar {
   }
 
   unsafe fn subscribe_event(&self, navigator: &Rc<UnsafeCell<Navigator>>) {
-    use gtk::ToggleButtonExt;
-
-    let builder = self.builder.clone();
-    let navigator_ref = navigator.get();
-    let events = (*navigator_ref).get_events().get();
+    use gtk::HeaderBarExt;
     
-    // (*events).subscribe(move |event| {
-    //   match event {
-    //     Event::OpenPage(p) => {
-    //       let page = &p[..];
-    //       let btn_query = format!("btn-{}", &page);
-    //       println!("change toggle to: {}", &page);
+    let headerbar = self.headerbar.get();
+    let navigator_ref = navigator.get();
 
-    //       if page == "home" || page == "reader" {
-    //         let button: gtk::RadioButton = builder.get_object(&btn_query[..]).unwrap();
-    //         button.set_active(true);
-    //       }
-    //     },
-    //     _ => {}
-    //   }
-    // });
+    // Default title
+    (*headerbar).set_title(Some("Home"));
+
+    let events_ref = (*navigator_ref).get_events();
+    let events = events_ref.get();
+
+    (*events).subscribe(move |event| {
+      match event {
+        Event::GetArticle(name) => {
+          let title = (*navigator_ref).get_page_title("reader");
+          (*headerbar).set_subtitle(Some(&name[..]));
+          (*headerbar).set_title(title);
+        },
+
+        Event::OpenPage(name) => {
+          let title = (*navigator_ref).get_page_title(&name[..]);
+          (*headerbar).set_subtitle(None);
+          (*headerbar).set_title(title);
+        }
+        _ => {}
+      }
+    });
   }
 
   pub fn setup(&self, navigator: &Rc<UnsafeCell<Navigator>>) {
     unsafe {
       self.setup_toggle_sidebar(navigator);
       self.subscribe_event(navigator);
-      self.setup_routing(navigator);
       self.setup_search(navigator);
     }
 
     self.setup_icons();
   }
 
-  pub fn get_content(&self) -> &gtk::HeaderBar {
+  pub fn get_content(&self) -> &Rc<UnsafeCell<gtk::HeaderBar>> {
     return &self.headerbar;
   }
 }

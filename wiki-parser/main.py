@@ -112,5 +112,5 @@ for line in sys.stdin:
   text += line
 
 result_blocked = parse(text)
-file = open("result.json", "w", encoding="utf-8")
+# file = open("result.json", "w", encoding="utf-8")
 sys.stdout.write(json.dumps(result_blocked))

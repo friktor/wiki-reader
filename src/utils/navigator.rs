@@ -73,6 +73,7 @@ impl Navigator {
     (*events).subscribe(move |event| {
       match event {
         Event::OpenPage(name) => (*stack).set_visible_child_name(&name[..]),
+        Event::GetArticle(_) => (*stack).set_visible_child_name("reader"),
         _ => {}
       } 
     });
@@ -83,6 +84,23 @@ impl Navigator {
         page.on_receive_event(cloned_event);
       }
     });
+  }
+
+  pub unsafe fn get_page_title(&self, name: &str) -> Option<&str> {
+    let pages = self.pages.get();
+
+    for page in (*pages).iter() {
+      let ref_view = page.get_view();
+      let view = ref_view.get();
+      let page_name = (*view).get_name();
+
+      if name == page_name {
+        let page_title = (*view).get_title();
+        return Some(page_title);
+      }
+    }
+
+    None
   }
 
   pub unsafe fn setup(&self) {

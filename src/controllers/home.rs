@@ -22,12 +22,12 @@ impl Home {
 }
 
 impl Controller for Home {
+  fn get_view(&self) -> &Rc<UnsafeCell<View>> {
+    &self.view
+  }
+  
   fn on_receive_event(&self, event: Event) {
     let view = self.view.get();
     unsafe { (*view).on_receive_event(event.clone()) }
-  }
-
-  fn get_view(&self) -> &Rc<UnsafeCell<View>> {
-    &self.view
   }
 }

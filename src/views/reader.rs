@@ -11,6 +11,7 @@ use self::serde_json::Value;
 
 pub struct Reader<'a> {
   events: Rc<UnsafeCell<EventEmitter>>,
+  container: gtk::Box,
   content: gtk::Box,
   title: String,
   name: &'a str
@@ -18,17 +19,32 @@ pub struct Reader<'a> {
 
 impl <'a>Reader<'a> {
   pub fn new(events: &Rc<UnsafeCell<EventEmitter>>) -> Reader<'a> {
+    use gtk::ScrolledWindowExt;
     use gtk::StyleContextExt;
+    use gtk::ContainerExt;
     use gtk::WidgetExt;
+    use gtk::BoxExt;
+
+    let container = gtk::Box::new(gtk::Orientation::Vertical, 0);
+    let context = container.get_style_context().unwrap();
+    context.add_class("reader-page");
+
+    let scrolled = gtk::ScrolledWindow::new(None, None);
+    scrolled.set_policy(gtk::PolicyType::Automatic, gtk::PolicyType::Automatic);
 
     let content = gtk::Box::new(gtk::Orientation::Vertical, 0);
-    let context = content.get_style_context().unwrap();
-    context.add_class("reader-page");
+    // let content_context = content.get_style_context().unwrap();
+    // content_context.add_class("too-big-box");
+
+    scrolled.add(&content);
+
+    container.pack_start(&scrolled, true, true, 0);
 
     Reader {
       title: String::from("Reader"),
       events: events.clone(),
       name: "reader",
+      container,
       content
     }
   }
@@ -57,44 +73,10 @@ impl <'a>Reader<'a> {
         self.content.show_all();
       }
     }
-    
-    // let events = self.events.get();
-    // let page = Event::OpenPage(String::from("reader"));
-    // unsafe { (*events).push(page) }
-  }
-
-  fn disambiguation_content(&self, container: &gtk::Box, content: &Value) {
-    use gtk::StyleContextExt;
-    use gtk::WidgetExt;
-    use gtk::ButtonExt;
-    use gtk::BoxExt;
-
-    let list_container = gtk::Box::new(gtk::Orientation::Vertical, 0);
-    let pages = content["pages"].as_array().unwrap();
-    let events = self.events.get();
-
-    let list = pages.clone();
-    for page in list {
-      let label = page.as_str().unwrap();
-      let button = gtk::Button::new_with_label(label.clone());
-      
-      let style_context = button.get_style_context().unwrap();
-      style_context.add_class("redirect-link-button");
-
-      let name = String::from(label.clone());
-      button.connect_clicked(move |event| {
-        unsafe { (*events).push(Event::GetArticle(name.clone())) }
-      });
-
-      list_container.pack_end(&button, false, true, 0);
-    }
-
-    container.pack_end(&list_container, false, true, 0);
-    container.show_all();
   }
 
   fn page_content(&self, container: &gtk::Box, content: &Value) {
-
+    
   }
 
   fn get_nodes(&self, article: Article, title: String) -> gtk::Box {
@@ -103,7 +85,7 @@ impl <'a>Reader<'a> {
     use gtk::BoxExt;
 
     let container = gtk::Box::new(gtk::Orientation::Vertical, 0);
-    
+
     let article_title = gtk::Label::new(&title[..]);
     let title_context = article_title.get_style_context().unwrap();
     title_context.add_class("page-title");
@@ -116,7 +98,7 @@ impl <'a>Reader<'a> {
 
 impl <'a>View for Reader<'a> {
   fn get_content(&self) -> &gtk::Box {
-    &self.content
+    &self.container
   }
 
   fn get_name(&self) -> &str {
