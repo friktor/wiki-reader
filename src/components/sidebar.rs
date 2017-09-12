@@ -29,7 +29,7 @@ impl AppSidebar {
     content.set_baseline_position(gtk::BaselinePosition::Center);
     add_class_to_widget(&content, "button");
 
-    let icon_path = format!("/org/gtk/Lurkmore/images/{}.png", &*text);
+    let icon_path = format!("/org/gtk/wikireader/images/{}.png", &*text);
     let pixbuf = Pixbuf::new_from_resource_at_scale(&*icon_path, 35, 35, false).unwrap();
 
     let icon = gtk::Image::new_from_pixbuf(Some(&pixbuf));
@@ -65,7 +65,7 @@ impl AppSidebar {
     add_class_to_widget(&header, "sidebar-header");
 
     let pixbuf = Pixbuf::new_from_resource_at_scale(
-      "/org/gtk/Lurkmore/images/logo.png",
+      "/org/gtk/wikireader/images/logo.png",
       60, 60, false
     ).unwrap();
 

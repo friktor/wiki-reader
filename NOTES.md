@@ -1,3 +1,11 @@
+# TODO
+- Moving String to &str conversions from _&my[..]_ to _&*my_
+- Adding i18n to project
+- Adding progressive searched home page
+  - popover selection of target resources
+  - autosuggest for search input
+  - info blocks for home
+
 ## API Examples
 
 #### Request content page by title

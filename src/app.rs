@@ -24,7 +24,7 @@ pub struct Application {
 
 impl Application {
   pub fn new() -> Application {
-    let builder = gtk::Builder::new_from_resource("/org/gtk/Lurkmore/c_ui/app.xml");
+    let builder = gtk::Builder::new_from_resource("/org/gtk/wikireader/c_ui/app.xml");
     let window: gtk::Window = builder.get_object("app_window").unwrap();
     let settings = gtk::Settings::get_default().unwrap();
 

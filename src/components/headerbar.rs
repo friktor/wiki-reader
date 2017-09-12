@@ -16,7 +16,7 @@ pub struct AppHeaderBar {
 
 impl AppHeaderBar {
   pub fn new() -> AppHeaderBar {
-    let builder = gtk::Builder::new_from_resource("/org/gtk/Lurkmore/c_ui/headerbar.xml");
+    let builder = gtk::Builder::new_from_resource("/org/gtk/wikireader/c_ui/headerbar.xml");
     let headerbar: gtk::HeaderBar = builder.get_object("app_headerbar").unwrap();
     let search: gtk::Entry = builder.get_object("search_input").unwrap();
 
@@ -36,7 +36,7 @@ impl AppHeaderBar {
       let query = format!("btn-{}-image", &name);
       let element: gtk::Image = self.builder.get_object(&query).unwrap();      
 
-      let path = format!("/org/gtk/Lurkmore/images/{}.png", &name);
+      let path = format!("/org/gtk/wikireader/images/{}.png", &name);
       let image = Pixbuf::new_from_resource_at_scale(&path, 20, 20, false).unwrap();
       element.set_from_pixbuf(Some(&image));
     }
