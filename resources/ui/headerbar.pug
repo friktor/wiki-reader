@@ -4,38 +4,10 @@ interface
   requires(lib="gtk+" version="3.20")/
   
   object(class="GtkHeaderBar" id="app_headerbar")
-    style: class(name="app_headerbar")/
+    style: class(name="app-headerbar")/
     property(name="show_close_button") True
     property(name="can_focus") False
     property(name="visible") True
-    
-    //- child(type="title")
-    //-   object(class="GtkBox")
-    //-     property(name="visible") 1
-    //-     style
-    //-       class(name="app_headerbar_radio")/
-    //-       class(name="linked")/
-      
-    //-     child: object(class="GtkRadioButton" id="btn-home")
-    //-       style: class(name="image-button")/
-    //-       property(name="draw-indicator") 0
-    //-       property(name="visible") 1
-    //-       property(name="active") 1
-            
-    //-       child: object(class="GtkImage" id="btn-home-image")
-    //-         property(name="icon-size") 1
-    //-         property(name="visible") 1
-          
-    //-     child: object(class="GtkRadioButton" id="btn-reader")
-    //-       style: class(name="image-button")/
-    //-       property(name="draw-indicator") 0
-    //-       property(name="group") btn-home
-    //-       property(name="visible") 1
-    //-       property(name="active") 0
-            
-    //-       child: object(class="GtkImage" id="btn-reader-image")
-    //-         property(name="icon-size") 1
-    //-         property(name="visible") 1
     
     child
       object(class="GtkBox")

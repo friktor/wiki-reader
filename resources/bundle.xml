@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <gresources>
   <gresource prefix="/org/gtk/Lurkmore">
-    <file>images/reader.png</file>
     <file>images/search.png</file>
     <file>images/logo.png</file>
     <file>images/menu.png</file>
     <file>images/home.png</file>
+    <file>images/about.png</file>
+    <file>images/settings.png</file>
 
     <file compressed="true">c_ui/app.xml</file>
     <file compressed="true">c_ui/pages.xml</file>

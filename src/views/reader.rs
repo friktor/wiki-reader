@@ -85,6 +85,7 @@ impl <'a>Reader<'a> {
     use gtk::BoxExt;
 
     let container = gtk::Box::new(gtk::Orientation::Vertical, 0);
+    println!("{}", &article.content);
 
     let article_title = gtk::Label::new(&title[..]);
     let title_context = article_title.get_style_context().unwrap();

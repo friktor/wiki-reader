@@ -8,6 +8,7 @@ extern crate gtk;
 
 pub mod controllers;
 pub mod components;
+pub mod contents;
 pub mod utils;
 pub mod views;
 mod app;

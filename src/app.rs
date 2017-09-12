@@ -3,6 +3,7 @@ extern crate gtk;
 extern crate gdk;
 
 use components::headerbar::AppHeaderBar;
+use components::sidebar::AppSidebar;
 use utils::navigator::Navigator;
 use utils::traits::{ Event };
 use std::cell::UnsafeCell;
@@ -12,50 +13,60 @@ use self::gdk::{ Screen };
 use gtk::prelude::*;
 
 pub struct Application {
-  navigator: Rc<UnsafeCell<Navigator>>,
-  headerbar: AppHeaderBar,
   settings: gtk::Settings,
   builder: gtk::Builder,
   window: gtk::Window,
+
+  navigator: Rc<UnsafeCell<Navigator>>,
+  headerbar: AppHeaderBar,
+  sidebar: AppSidebar,
 }
 
 impl Application {
   pub fn new() -> Application {
-    // Setup&get containers
     let builder = gtk::Builder::new_from_resource("/org/gtk/Lurkmore/c_ui/app.xml");
     let window: gtk::Window = builder.get_object("app_window").unwrap();
     let settings = gtk::Settings::get_default().unwrap();
 
     let navigator = Rc::new(UnsafeCell::new(Navigator::new()));
+
     let headerbar = AppHeaderBar::new();
     headerbar.setup(&navigator);
+
+    let sidebar = AppSidebar::new();
+    sidebar.setup(&navigator);
     
     // final blocks
     Application {
       navigator,
       headerbar,
+      sidebar,
+
       settings,
       builder,
       window
     }
   }
 
-  unsafe fn setup_navigator(&self) {
-    let builder = self.builder.clone();
+  unsafe fn setup_navigator(&self) {    
     let navigator_ref = self.navigator.get();
     (*navigator_ref).setup();
-    let events = (*navigator_ref).get_events().get();
 
     let container: gtk::Box = self.builder.get_object("app_container").unwrap();
+    let events = (*navigator_ref).get_events().get();
+
+    // Sidebar prepares
+    let sidebar = self.sidebar.get_content();
+    let sidebar_content = sidebar.get();
+    container.pack_start(&*sidebar_content, false, true, 0);
+
+    // Pages content prepare
     let stack = (*navigator_ref).stack.get();
     container.pack_end(&*stack, true, true, 0);
 
+    // Global Listeners
     (*events).subscribe(move |event| {
-      let sidebar: gtk::Revealer = builder.get_object("sidebar").unwrap();
-      let status = sidebar.get_reveal_child();
-
       match event {
-        Event::ToggleSidebar => sidebar.set_reveal_child(!status),
         _ => {}
       }
     });
