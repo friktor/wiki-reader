@@ -7,48 +7,53 @@ interface
     property(name="orientation") vertical
     property(name="can_focus") True
     property(name="visible") True
-    style: class(name="home-page")/
+    style: class(name="page")/
+    style: class(name="home")/
+
+    child
+      object(class="GtkImage" id="logo-image")
+        property(name="icon-size") 1
+        property(name="visible") 1
+        style: class(name="logo")/
+      packing
+        property(name="expand") False
+        property(name="position") 0
+        property(name="fill") False
 
     child
       object(class="GtkBox")
         property(name="can_focus") True
         property(name="visible") True
-        style: class(name="boxes")/
+        style: class(name="search")/
 
         child
-          object(class="GtkBox")
-            property(name="orientation") vertical
+          object(class="GtkEntry" id="entry-search")
+            style: class(name="input")/
+            property(name="placeholder-text") Enter article name here
+            property(name="activates-default") True
             property(name="can_focus") True
+            property(name="editable") True
             property(name="visible") True
-            style: class(name="card-box")/
           packing
             property(name="expand") True
             property(name="position") 0
             property(name="fill") True
 
         child
-          object(class="GtkBox")
-            property(name="orientation") vertical
+          object(class="GtkButton" id="button-search")
+            property(name="receives_default") True
             property(name="can_focus") True
             property(name="visible") True
-            style: class(name="card-box")/
+            style: class(name="button")/
+            child: object(class="GtkImage" id="search-image")
+              property(name="icon-size") 1
+              property(name="visible") 1
           packing
-            property(name="expand") True
+            property(name="expand") False
             property(name="position") 1
-            property(name="fill") True
-
-        child
-          object(class="GtkBox")
-            property(name="orientation") vertical
-            property(name="can_focus") True
-            property(name="visible") True
-            style: class(name="card-box")/
-          packing
-            property(name="expand") True
-            property(name="position") 2
-            property(name="fill") True
+            property(name="fill") False
 
       packing
         property(name="expand") False
-        property(name="position") 0
+        property(name="position") 1
         property(name="fill") True

@@ -20,7 +20,8 @@ pub enum ErrorReason {
 #[derive(Clone)]
 pub enum WikiResource {
   Wikipedia,
-  Lurkmore
+  Lurkmore,
+  Custom
 }
 
 #[derive(Clone)]
@@ -141,7 +142,8 @@ impl Article {
 
     let host = match resource {
       WikiResource::Wikipedia => "https://ru.wikipedia.org/w/api.php",
-      WikiResource::Lurkmore => "http://lurkmore.to/api.php"
+      WikiResource::Lurkmore => "http://lurkmore.to/api.php",
+      WikiResource::Custom => "~~~ TODO ~~~"
     };
 
     for (param, value) in &params {

@@ -7,6 +7,8 @@
     <file>images/home.png</file>
     <file>images/about.png</file>
     <file>images/settings.png</file>
+    <file>images/wikipedia-logo.png</file>
+    <file>images/lurkmore-logo.png</file>
 
     <file compressed="true">c_ui/app.xml</file>
     <file compressed="true">c_ui/pages.xml</file>

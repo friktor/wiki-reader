@@ -13,7 +13,8 @@ pub struct Reader {
 
 impl Reader {
   pub fn new(events: &Rc<UnsafeCell<EventEmitter>>) -> Reader {
-    let view = ReaderView::new(events);
+    let mut view = ReaderView::new(events);
+    view.setup();
     
     Reader {
       view: Rc::new(UnsafeCell::new(view))

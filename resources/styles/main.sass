@@ -1,108 +1,11 @@
+@import 'popover-switcher'
+@import 'headerbar'
+@import 'sidebar'
+@import 'page'
+@import 'home'
+
 *, .background.csd
   font-family: "Roboto", "Noto"
 
 .background.csd
-  .app-headerbar
-    .headerbar-search
-      transition: all 0.2s ease
-      margin-left: 10px
-      margin-right: 5px
-
-      &:focus
-        min-width: 250px
-
-  .sidebar-root
-    padding-right: 5px
-
-    .sidebar.vertical
-      box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24)
-      background-color: #323843
-      border-right: none
-      min-width: 80px
-
-    .sidebar-header
-      background-color: saturate(#323843, 10%)
-      box-shadow: 0 1px 2px rgba(0,0,0,0.34)
-      padding: 10px 0
-
-      .sidebar-header-label
-        text-shadow: 2px 2px 2px rgba(0,0,0,0.15)
-        color: rgba(255,255,255, 0.8)
-
-    .menu-list
-      .menu-button-root
-        transition: all 0.35s ease-in-out
-        background-color: transparent
-        padding: 10px 0 0 0
-        border-radius: 0
-        border: none
-        border-bottom: 1px solid transparentize(#FFF, 0.9)
-
-        .button
-          padding: 0
-          margin: 0
-          .icon
-            padding: 5px 0 10px 0
-          .label
-            background-color: transparentize(#FFF, 0.95)
-            font-size: 14px
-            padding: 4px 0
-            color: #FFF
-
-        &:hover
-          background-color: transparentize(#000, 0.7)
-          
-          &:nth-child(1)
-            background-color: transparentize(#2196F3, 0.7)
-            .label
-              background-color: #2196F3
-          &:nth-child(2)
-            background-color: transparentize(#FF5722, 0.7)
-            .label
-              background-color: #FF5722
-          &:nth-child(3)
-            background-color: transparentize(#8BC34A, 0.7)
-            .label
-              background-color: #8BC34A
-          
-          .button
-            .icon
-              padding: 5px 0 6px 0
-            .label
-              padding: 6px 0
-              color: #FFF
-
-  .home-page, .reader-page
-    box-shadow: 0 1px 2px rgba(0,0,0,0.24)
-    background-color: #FFFFFF
-    border-radius: 3px
-    padding: 15px
-    margin: 20px
-
-  .reader-page
-    .page-title
-      color: transparentize(#000, 0.3)
-      margin-bottom: 25px
-      font-size: 30px
-    
-    .redirect-link-button
-      background-color: transparentize(#EEE, 0.3)
-      color: transparentize(#000, 0.2)
-      padding: 8px 10px
-      border-radius: 0
-
-      border-bottom: 1px solid transparentize(#b8b8b8, 0.6)
-      border-right: none
-      border-left: none
-      border-top: none
-
-      &:first-child
-        border-top-right-radius: 3px
-        border-top-left-radius: 3px
-      &:last-child
-        border-bottom-right-radius: 3px
-        border-bottom-left-radius: 3px
-        border-bottom: none
-
-    .too-big-box
-      min-height: 800px
+  background-color: transparentize(#383c49, 0.1)

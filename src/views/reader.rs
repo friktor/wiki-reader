@@ -27,7 +27,8 @@ impl <'a>Reader<'a> {
 
     let container = gtk::Box::new(gtk::Orientation::Vertical, 0);
     let context = container.get_style_context().unwrap();
-    context.add_class("reader-page");
+    context.add_class("page");
+    context.add_class("reader");
 
     let scrolled = gtk::ScrolledWindow::new(None, None);
     scrolled.set_policy(gtk::PolicyType::Automatic, gtk::PolicyType::Automatic);
@@ -115,5 +116,9 @@ impl <'a>View for Reader<'a> {
       Event::GetArticle(name) => self.get_article(name),
       _ => {}
     }
+  }
+
+  fn setup(&mut self) {
+    
   }
 }

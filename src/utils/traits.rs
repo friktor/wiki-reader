@@ -8,6 +8,7 @@ pub trait View {
   fn get_content(&self) -> &gtk::Box;
   fn get_title(&self) -> &str;
   fn get_name(&self) -> &str;
+  fn setup(&mut self);
 }
 
 pub trait Controller {

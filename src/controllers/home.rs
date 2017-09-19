@@ -13,7 +13,8 @@ pub struct Home {
 
 impl Home {
   pub fn new(events: &Rc<UnsafeCell<EventEmitter>>) -> Home {
-    let view = HomeView::new(events);
+    let mut view = HomeView::new(events);
+    view.setup();
     
     Home {
       view: Rc::new(UnsafeCell::new(view))
