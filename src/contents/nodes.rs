@@ -12,18 +12,18 @@ use self::serde_json::Value;
 pub fn render_section_node(section: Value) {
   let properties = section["properties"].as_array().unwrap();
   
-  println!("SOURCE JSON: \n\n{}\n\n", &section);
   let _w = section["wikicode"].as_str().unwrap();
   let wikicode = String::from(_w);
 
-  let mut templates_ranges: Vec<(usize, usize, &str)> = vec![];
+  let mut templates_ranges: Vec<(usize, usize, &str, &str)> = vec![];
   for property in properties {
     let prop_type = property["type"].as_str().unwrap();
     let prop_code = property["wikicode"].as_str().unwrap();
-    let start_slice = wikicode.find(prop_code).unwrap();
-    let code_lenght = prop_code.len();
+    
+    let start = wikicode.find(prop_code).unwrap();
+    let end = prop_code.len() + start;
 
-    let result = (start_slice, start_slice+code_lenght, prop_type);
+    let result = (start, end, prop_type, prop_code);
     templates_ranges.push(result);
   }
 
@@ -34,33 +34,16 @@ pub fn render_section_node(section: Value) {
     a_start.cmp(&b_start)
   });
 
-  let mut ranges: Vec<(usize, usize, &str)> = vec![];
-  let mut starter_index: usize = 0;
-  for range in &templates_ranges {
-    let &(start, end, prop_type) = range;
+  // for range in &templates_ranges {
+  //   println!("({}, {}, \"{}\")\n", range.0, range.1, range.2);
+  // }
 
-    let result = (starter_index, start, "text");
-    ranges.push(result);
-    ranges.push(range.clone());
-    starter_index = end+1;
-  }
+  // let mut text_ranges: Vec<(usize, usize, &str, &str)> = vec![];
+  // let mut skiped: usize = 0;
 
-  ranges.retain(|&e| {
-    let range_empty = (e.0 == e.1);
-    if range_empty { return false; }
-
-    let range_nil = (e.0 == (e.1 - 1));
-    if range_nil { return false; }
-
-    true
-  });
-
-  // for range in &ranges {
-  //   let (start, end, _) = range.clone();
-
-  //   println!("all len: {}, end of chunk: {}", &wikicode.len(), &end);
-  //   let text = &wikicode[start..end];
-
-  //   println!("({}, {}, \"{}\")\n{}\n\n", range.0, range.1, range.2, text);
+  // for range in &templates_ranges {
+  //   let text: String = wikicode.chars().skip(skiped).take((range.0 - 1)).collect();
+  //   println!("(skiped: {}, taked: {})\n{}\n\n", skiped, range.0, text);
+  //   skiped = (range.0 - 1);
   // }
 }

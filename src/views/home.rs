@@ -70,10 +70,10 @@ impl <'a>Home<'a> {
     use gtk::BoxExt;
     
     let search_resource = self.search_resource.get();
-    let list = self.wiki_switcher.list.get();
+    let list = self.wiki_switcher.list.clone();
     self.wiki_switcher.setup();
 
-    (*list).connect_row_selected(move |list, selected| {
+    list.borrow_mut().connect_row_selected(move |list, selected| {
       let row = selected.clone().unwrap();
       let selected_index = row.get_index();
       
@@ -83,7 +83,7 @@ impl <'a>Home<'a> {
         _ => WikiResource::Custom
       };
 
-      *search_resource = resource;
+      // *search_resource = resource;
     });
 
     // Pack label search
@@ -95,8 +95,8 @@ impl <'a>Home<'a> {
     self.content.pack_start(&label, false, true, 0);
 
     // Pack popover switcher to end
-    let button = self.wiki_switcher.button.get();
-    self.content.pack_end(&*button, false, false, 0);
+    let button = self.wiki_switcher.button.clone();
+    self.content.pack_end(&*button.borrow(), false, false, 0);
   }
 
   unsafe fn prepare_search_action(&self) {

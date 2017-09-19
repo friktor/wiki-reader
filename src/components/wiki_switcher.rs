@@ -7,14 +7,14 @@ use self::gdk_pixbuf::{ Pixbuf };
 use utils::add_class_to_widget;
 use utils::wiki::WikiResource;
 
-use std::cell::{ UnsafeCell, RefCell };
+use std::cell::{ RefCell };
 use std::ops::FnMut;
 use std::rc::Rc;
 
 pub struct WikiSwitcher {
-  pub button: Rc<UnsafeCell<gtk::Button>>,
-  pub list: Rc<UnsafeCell<gtk::ListBox>>,
-  popover: Rc<UnsafeCell<gtk::Popover>>,
+  pub button: Rc<RefCell<gtk::Button>>,
+  pub list: Rc<RefCell<gtk::ListBox>>,
+  popover: Rc<RefCell<gtk::Popover>>,
 }
 
 impl WikiSwitcher {
@@ -32,37 +32,38 @@ impl WikiSwitcher {
     popover.add(&list);
 
     WikiSwitcher {
-      popover: Rc::new(UnsafeCell::new(popover)),
-      button: Rc::new(UnsafeCell::new(button)),
-      list: Rc::new(UnsafeCell::new(list)),
+      popover: Rc::new(RefCell::new(popover)),
+      button: Rc::new(RefCell::new(button)),
+      list: Rc::new(RefCell::new(list)),
     }
   }
 
-  unsafe fn prepare_visible(&self) {
+  fn prepare_visible(&self) {
     use gtk::ButtonExt;
     use gtk::WidgetExt;
 
-    let popover = self.popover.get();
-    let button = self.button.get();
+    let popover = self.popover.clone();
+    let button = self.button.clone();
 
-    (*button).connect_clicked(move |event| {
-      if (*popover).get_visible() {
-        (*popover).hide();
+    button.borrow().connect_clicked(move |event| {
+      let menu = popover.borrow();
+      if menu.get_visible() {
+        menu.hide();
       } else {
-        (*popover).show_all();
+        menu.show_all();
       }
     });
   }
 
-  unsafe fn prepare_list(&self) {
+  fn prepare_list(&self) {
     use gtk::ListBoxRowExt;
     use gtk::ListBoxExt;
     use gtk::ButtonExt;
     use gtk::BoxExt;
 
     let resources = ["Wikipedia", "Lurkmore"];
-    let button = self.button.get();
-    let list = self.list.get();
+    let button = self.button.clone();
+    let list = self.list.clone();
 
     for (i, resource) in resources.iter().enumerate() {
       let row = gtk::Box::new(gtk::Orientation::Horizontal, 0);
@@ -85,31 +86,29 @@ impl WikiSwitcher {
       row.pack_start(&label, false, false, 0);
 
       let index = i as i32;
-      (*list).insert(&row, index);
+      list.borrow().insert(&row, index);
     }
 
     // Set Lurkmore default row
-    if let Some(row) = (*list).get_row_at_index(1) {
-      (*list).select_row(Some(&row));
+    if let Some(row) = list.borrow().get_row_at_index(1) {
+      list.borrow().select_row(Some(&row));
     }
 
     // Connect to selected for change button label
-    (*list).connect_row_selected(move |list, selected| {
+    list.borrow().connect_row_selected(move |list, selected| {
       let row = selected.clone().unwrap();
       let selected_index = row.get_index();
 
       match selected_index {
-        0 => (*button).set_label("Wikipedia"),
-        1 => (*button).set_label("Lurkmore"),
+        0 => button.borrow().set_label("Wikipedia"),
+        1 => button.borrow().set_label("Lurkmore"),
         _ => {}
       }
     });
   }
 
   pub fn setup(&self) {
-    unsafe {
-      self.prepare_visible();
-      self.prepare_list();
-    }
+    self.prepare_visible();
+    self.prepare_list();
   }
 }
