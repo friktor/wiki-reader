@@ -6,6 +6,7 @@ use std::rc::Rc;
 
 use utils::navigator::{ Navigator, EventEmitter };
 use utils::wiki::{ Article, ErrorReason };
+use contents::nodes::render_section_node;
 use utils::traits::{ View, Event };
 use self::serde_json::Value;
 
@@ -84,6 +85,9 @@ impl <'a>Reader<'a> {
     use gtk::StyleContextExt;
     use gtk::WidgetExt;
     use gtk::BoxExt;
+
+    let section_one = article.content[0].clone();
+    render_section_node(section_one);
 
     let container = gtk::Box::new(gtk::Orientation::Vertical, 0);
     println!("{}", &article.content);
