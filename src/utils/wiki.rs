@@ -1,20 +1,16 @@
-extern crate serde_json;
-extern crate reqwest;
-extern crate url;
-
-use self::serde_json::{ Value, from_str as json_from_str };
-use std::process::{Command, Stdio};
+use serde_json::{ Value, from_str as json_from_str };
+use std::process::{ Command, Stdio };
 use std::collections::HashMap;
 use std::io::prelude::*;
-use self::reqwest::get;
 use std::error::Error;
-use self::url::Url;
+use reqwest::get;
+use url::Url;
 
 #[derive(Clone)]
 pub enum ErrorReason {
-  formatting,
-  request,
-  parsing,
+  Formatting,
+  Request,
+  Parsing,
 }
 
 #[derive(Clone)]
@@ -35,7 +31,7 @@ pub struct Article {
 impl Article {
   pub fn new_from_title(title: String) -> Result<Article, ErrorReason> {
     match Article::get_article_by_title(title, WikiResource::Lurkmore) {
-      Ok(mut response) => Article::normalize_response(response),
+      Ok(response) => Article::normalize_response(response),
       Err(reason) => Err(reason)
     }
   }
@@ -55,14 +51,14 @@ impl Article {
       Ok(mut response) => {
         let json = response.json();
         match json {
-          Err(error) => Err(ErrorReason::parsing),
+          Err(_) => Err(ErrorReason::Parsing),
           Ok(tree) => Ok(tree)
         }
       },
 
       Err(error) => {
         println!("Error: {}", error.description());
-        Err(ErrorReason::request)
+        Err(ErrorReason::Request)
       }
     }
   }
@@ -71,21 +67,21 @@ impl Article {
     let pages = &response["query"]["pages"];
     
     if !pages.is_object() {
-      return Err(ErrorReason::formatting)
+      return Err(ErrorReason::Formatting)
     }
 
     let object = pages.as_object().unwrap();
     let negative_key = String::from("-1");
 
     if object.is_empty() || object.contains_key(&negative_key) {
-      return Err(ErrorReason::parsing)
+      return Err(ErrorReason::Parsing)
     }
 
     let mut wikicode = String::new();
     let mut title = String::new();
     let mut page_id: i64 = -1;
     
-    for (key, value) in object.iter() {
+    for (_, value) in object.iter() {
       let s = value["revisions"][0]["*"].as_str().unwrap();
       let t = value["title"].as_str().unwrap();
       
@@ -120,18 +116,18 @@ impl Article {
     };
 
     match process.stdin.unwrap().write_all(code.as_bytes()) {
-      Err(error) => return Err(ErrorReason::parsing),
+      Err(_) => return Err(ErrorReason::Parsing),
       Ok(_) => {}
     }
 
     let mut dirty_ast = String::new();
     match process.stdout.unwrap().read_to_string(&mut dirty_ast) {
-      Err(why) => return Err(ErrorReason::parsing),
+      Err(_) => return Err(ErrorReason::Parsing),
       Ok(_) => {} 
     }
 
     match json_from_str(&dirty_ast[..]) {
-      Err(error) => Err(ErrorReason::parsing),
+      Err(_) => Err(ErrorReason::Parsing),
       Ok(ast) => Ok(ast)
     }
   }

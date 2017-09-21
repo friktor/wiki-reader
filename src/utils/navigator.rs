@@ -1,11 +1,12 @@
-extern crate gtk;
-
-use utils::traits::{ View, Controller, Event };
+use utils::traits::{ Controller, Event };
 use controllers::get_controllers;
 
-use std::cell::{ UnsafeCell, RefCell };
+use std::cell::RefCell;
 use std::ops::FnMut;
 use std::rc::Rc;
+use gtk;
+
+use gtk::StackExt;
 
 pub struct EventEmitter {
   listeners: Vec<Rc<RefCell<FnMut(Event)>>>
@@ -31,16 +32,14 @@ impl EventEmitter {
 }
 
 pub struct Navigator {
-  pub pages: Rc<UnsafeCell<Vec<Box<Controller>>>>,
-  pub events: Rc<UnsafeCell<EventEmitter>>,
-  pub stack: Rc<UnsafeCell<gtk::Stack>>,
+  pub pages: Rc<RefCell<Vec<Box<Controller>>>>,
+  pub events: Rc<RefCell<EventEmitter>>,
+  pub stack: gtk::Stack,
 }
 
 impl Navigator {
   pub fn new() -> Navigator {
-    use gtk::StackExt;
-
-    let events = Rc::new(UnsafeCell::new(EventEmitter::new()));
+    let events = Rc::new(RefCell::new(EventEmitter::new()));
 
     // Stack with options
     let content_stack: gtk::Stack = gtk::Stack::new();
@@ -48,9 +47,9 @@ impl Navigator {
     content_stack.set_transition_duration(200);
     content_stack.set_homogeneous(true);
 
-    let controllers = get_controllers(&events);
-    let pages: Rc<UnsafeCell<Vec<Box<Controller>>>> = Rc::new(UnsafeCell::new(controllers));
-    let stack = Rc::new(UnsafeCell::new(content_stack));
+    let controllers = get_controllers(events.clone());
+    let pages = Rc::new(RefCell::new(controllers));
+    let stack = content_stack;
 
     Navigator {
       events,
@@ -59,67 +58,45 @@ impl Navigator {
     }
   }
 
-  pub fn get_events(&self) -> &Rc<UnsafeCell<EventEmitter>> {
-    &self.events
+  pub fn get_events(&self) -> Rc<RefCell<EventEmitter>> {
+    self.events.clone()
   }
 
-  pub unsafe fn subscribe_events(&self) {
-    use gtk::StackExt;
+  pub fn subscribe_events(&self) {
+    let events = self.events.clone();
+    let stack = self.stack.clone();
+    let pages = self.pages.clone();
 
-    let events = self.events.get();
-    let stack = self.stack.get();
-    let pages = self.pages.get();
-
-    (*events).subscribe(move |event| {
+    events.borrow_mut().subscribe(move |event| {
       match event {
-        Event::OpenPage(name) => (*stack).set_visible_child_name(&name[..]),
-        Event::GetArticle(_) => (*stack).set_visible_child_name("reader"),
+        Event::OpenPage(name, _) => stack.set_visible_child_name(&*name),
+        Event::GetArticle(_) => stack.set_visible_child_name("reader"),
         _ => {}
       } 
     });
 
-    (*events).subscribe(move |event| {
-      for page in &(*pages) {
-        let cloned_event = event.clone();
-        page.on_receive_event(cloned_event);
+    events.borrow_mut().subscribe(move |event| {
+      for page in pages.borrow().iter() {
+        page.on_receive_event(event.clone());
       }
     });
   }
 
-  pub unsafe fn get_page_title(&self, name: &str) -> Option<&str> {
-    let pages = self.pages.get();
-
-    for page in (*pages).iter() {
-      let ref_view = page.get_view();
-      let view = ref_view.get();
-      let page_name = (*view).get_name();
-
-      if name == page_name {
-        let page_title = (*view).get_title();
-        return Some(page_title);
-      }
-    }
-
-    None
-  }
-
-  pub unsafe fn setup(&self) {
-    use gtk::StackExt;
-
-    let stack = self.stack.get();
-    let pages = self.pages.get();
+  pub fn setup(&self) {
+    let stack = self.stack.clone();
+    let pages = self.pages.clone();
     
-    for page in &(*pages) {
-      let view = page.get_view().get();
+    for page in pages.borrow().iter() {
+      let view = page.get_view();
 
-      let content = (*view).get_content();
-      let title = (*view).get_title();
-      let name = (*view).get_name();
+      let content = view.borrow().get_content();
+      let title = view.borrow().get_title();
+      let name = view.borrow().get_name();
 
-      (*stack).add_titled(content, name, title);
+      stack.add_titled(&content, &*name, &*title);
     }
 
-    (*stack).set_visible_child_name("home");
+    stack.set_visible_child_name("home");
     self.subscribe_events();
   }
 }

@@ -1,34 +1,32 @@
-extern crate gtk;
-
-use std::cell::UnsafeCell;
+use std::cell::RefCell;
 use std::rc::Rc;
 
-use utils::navigator::{ Navigator, EventEmitter };
 use utils::traits::{ Controller, View, Event };
+use utils::navigator::EventEmitter;
 use views::home::Home as HomeView;
 
 pub struct Home {
-  view: Rc<UnsafeCell<View>>
+  view: Rc<RefCell<View>>
 }
 
 impl Home {
-  pub fn new(events: &Rc<UnsafeCell<EventEmitter>>) -> Home {
+  pub fn new(events: Rc<RefCell<EventEmitter>>) -> Home {
     let mut view = HomeView::new(events);
     view.setup();
     
     Home {
-      view: Rc::new(UnsafeCell::new(view))
+      view: Rc::new(RefCell::new(view))
     }
   }
 }
 
 impl Controller for Home {
-  fn get_view(&self) -> &Rc<UnsafeCell<View>> {
-    &self.view
+  fn get_view(&self) -> Rc<RefCell<View>> {
+    self.view.clone()
   }
   
   fn on_receive_event(&self, event: Event) {
-    let view = self.view.get();
-    unsafe { (*view).on_receive_event(event.clone()) }
+    let view = self.view.clone();
+    view.borrow().on_receive_event(event);
   }
 }

@@ -1,19 +1,24 @@
-extern crate gdk_pixbuf;
-extern crate gtk;
-
-use std::cell::UnsafeCell;
+use std::cell::RefCell;
 use std::rc::Rc;
 
-use utils::navigator::{ Navigator, EventEmitter };
 use components::wiki_switcher::WikiSwitcher;
+use utils::navigator::EventEmitter;
 use utils::traits::{ View, Event };
-use self::gdk_pixbuf::{ Pixbuf };
 use utils::add_class_to_widget;
 use utils::wiki::WikiResource;
+use gdk_pixbuf::{ Pixbuf };
+use gtk;
+
+use gtk::ListBoxRowExt;
+use gtk::ListBoxExt;
+use gtk::ButtonExt;
+use gtk::ImageExt;
+use gtk::EntryExt;
+use gtk::BoxExt;
 
 pub struct Home<'a> {
-  search_resource: Rc<UnsafeCell<WikiResource>>,
-  events: Rc<UnsafeCell<EventEmitter>>,
+  search_resource: Rc<RefCell<WikiResource>>,
+  events: Rc<RefCell<EventEmitter>>,
   wiki_switcher: WikiSwitcher,
   builder: gtk::Builder,
   content: gtk::Box,
@@ -22,24 +27,23 @@ pub struct Home<'a> {
 }
 
 impl <'a>Home<'a> {
-  pub fn new(events: &Rc<UnsafeCell<EventEmitter>>) -> Home<'a> {
+  pub fn new(events: Rc<RefCell<EventEmitter>>) -> Home<'a> {
     let builder = gtk::Builder::new_from_resource("/org/gtk/wikireader/c_ui/home.xml");
     let content: gtk::Box = builder.get_object("page_home").unwrap();
     let wiki_switcher = WikiSwitcher::new();
 
     Home {
-      search_resource: Rc::new(UnsafeCell::new(WikiResource::Lurkmore)),
+      search_resource: Rc::new(RefCell::new(WikiResource::Lurkmore)),
       title: String::from("Home"),
-      events: events.clone(),
       wiki_switcher,
       name: "home",
       builder,
-      content
+      content,
+      events
     }
   }
 
   fn prepare_images(&self) {
-    use gtk::ImageExt;
     let names: [&str; 2] = ["logo", "search"];
     
     for name in &names {
@@ -64,16 +68,12 @@ impl <'a>Home<'a> {
     }
   }
 
-  unsafe fn prepare_switcher(&mut self) {
-    use gtk::ListBoxRowExt;
-    use gtk::ListBoxExt;
-    use gtk::BoxExt;
-    
-    let search_resource = self.search_resource.get();
+  fn prepare_switcher(&mut self) {    
+    let search_resource = self.search_resource.clone();
     let list = self.wiki_switcher.list.clone();
     self.wiki_switcher.setup();
 
-    list.borrow_mut().connect_row_selected(move |list, selected| {
+    list.connect_row_selected(move |_, selected| {
       let row = selected.clone().unwrap();
       let selected_index = row.get_index();
       
@@ -83,7 +83,7 @@ impl <'a>Home<'a> {
         _ => WikiResource::Custom
       };
 
-      // *search_resource = resource;
+      *search_resource.borrow_mut() = resource;
     });
 
     // Pack label search
@@ -96,36 +96,33 @@ impl <'a>Home<'a> {
 
     // Pack popover switcher to end
     let button = self.wiki_switcher.button.clone();
-    self.content.pack_end(&*button.borrow(), false, false, 0);
+    self.content.pack_end(&button, false, false, 0);
   }
 
-  unsafe fn prepare_search_action(&self) {
-    use gtk::ButtonExt;
-    use gtk::EntryExt;
-
+  fn prepare_search_action(&self) {
     let entry: gtk::Entry = self.builder.get_object("entry-search").unwrap();
     let button: gtk::Button = self.builder.get_object("button-search").unwrap();
 
-    let events = self.events.get();
+    let events = self.events.clone();
     button.connect_clicked(move |_| {
       if let Some(article_name) = entry.get_text() {
-        (*events).push(Event::GetArticle(article_name));
+        events.borrow_mut().push(Event::GetArticle(article_name));
       }
     });
   }
 }
 
 impl <'a>View for Home<'a> {
-  fn get_content(&self) -> &gtk::Box {
-    &self.content
+  fn get_content(&self) -> gtk::Box {
+    self.content.clone()
   }
 
-  fn get_name(&self) -> &str {
-    self.name
+  fn get_name(&self) -> String {
+    String::from(self.name)
   }
 
-  fn get_title(&self) -> &str {
-    &self.title[..]
+  fn get_title(&self) -> String {
+    self.title.clone()
   }
 
   fn on_receive_event(&self, event: Event) {
@@ -134,10 +131,7 @@ impl <'a>View for Home<'a> {
 
   fn setup(&mut self) {
     self.prepare_images();
-
-    unsafe {
-      self.prepare_switcher();
-      self.prepare_search_action();
-    }
+    self.prepare_switcher();
+    self.prepare_search_action();
   }
 }

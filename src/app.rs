@@ -1,23 +1,20 @@
-extern crate gdk_pixbuf;
-extern crate gtk;
-extern crate gdk;
-
 use components::headerbar::AppHeaderBar;
 use components::sidebar::AppSidebar;
 use utils::navigator::Navigator;
-use utils::traits::{ Event };
-use std::cell::UnsafeCell;
+use utils::traits::Event;
+use std::cell::RefCell;
 use std::rc::Rc;
 
-use self::gdk::{ Screen };
 use gtk::prelude::*;
+use gdk::Screen;
+use gtk;
 
 pub struct Application {
+  pub window: gtk::Window,
   settings: gtk::Settings,
   builder: gtk::Builder,
-  window: gtk::Window,
 
-  navigator: Rc<UnsafeCell<Navigator>>,
+  navigator: Rc<RefCell<Navigator>>,
   headerbar: AppHeaderBar,
   sidebar: AppSidebar,
 }
@@ -28,13 +25,13 @@ impl Application {
     let window: gtk::Window = builder.get_object("app_window").unwrap();
     let settings = gtk::Settings::get_default().unwrap();
 
-    let navigator = Rc::new(UnsafeCell::new(Navigator::new()));
+    let navigator = Rc::new(RefCell::new(Navigator::new()));
 
-    let headerbar = AppHeaderBar::new();
-    headerbar.setup(&navigator);
+    let headerbar = AppHeaderBar::new(navigator.borrow().get_events());
+    headerbar.setup();
 
-    let sidebar = AppSidebar::new();
-    sidebar.setup(&navigator);
+    let sidebar = AppSidebar::new(navigator.borrow().get_events());
+    sidebar.setup();
     
     // final blocks
     Application {
@@ -48,24 +45,23 @@ impl Application {
     }
   }
 
-  unsafe fn setup_navigator(&self) {    
-    let navigator_ref = self.navigator.get();
-    (*navigator_ref).setup();
-
+  fn setup_navigator(&self) {    
     let container: gtk::Box = self.builder.get_object("app_container").unwrap();
-    let events = (*navigator_ref).get_events().get();
+    let navigator = self.navigator.clone();
+    let events = navigator.borrow().get_events();
+
+    navigator.borrow().setup();
 
     // Sidebar prepares
-    let sidebar = self.sidebar.get_content();
-    let sidebar_content = sidebar.get();
-    container.pack_start(&*sidebar_content, false, true, 0);
+    let sidebar = self.sidebar.container.clone();
+    container.pack_start(&sidebar, false, true, 0);
 
     // Pages content prepare
-    let stack = (*navigator_ref).stack.get();
-    container.pack_end(&*stack, true, true, 0);
+    let stack = navigator.borrow().stack.clone();
+    container.pack_end(&stack, true, true, 0);
 
     // Global Listeners
-    (*events).subscribe(move |event| {
+    events.borrow_mut().subscribe(move |event| {
       match event {
         _ => {}
       }
@@ -73,8 +69,8 @@ impl Application {
   }
 
   fn setup_headerbar(&self) {
-    let headerbar = self.headerbar.get_content().get();
-    unsafe { self.window.set_titlebar(&*headerbar) }
+    let headerbar = self.headerbar.headerbar.clone();
+    self.window.set_titlebar(&headerbar);
   }
 
   fn setup_settings(&self) {
@@ -91,20 +87,9 @@ impl Application {
     );
   }
 
-  fn register_quit(&self) {
-    self.window.connect_delete_event(|_, _| {
-      gtk::main_quit();
-      Inhibit(false)
-    });
-  }
-
-  pub fn run(&self) {
-    unsafe { self.setup_navigator(); }
+  pub fn setup(&self) {
+    self.setup_navigator();
     self.setup_headerbar();
     self.setup_settings();
-    self.register_quit();
-
-    self.window.show_all();
-    gtk::main();
   }
 }

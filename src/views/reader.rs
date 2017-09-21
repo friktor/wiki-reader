@@ -1,17 +1,20 @@
-extern crate serde_json;
-extern crate gtk;
-
-use std::cell::UnsafeCell;
+use std::cell::RefCell;
 use std::rc::Rc;
 
-use utils::navigator::{ Navigator, EventEmitter };
 use utils::wiki::{ Article, ErrorReason };
-use contents::nodes::render_section_node;
 use utils::traits::{ View, Event };
-use self::serde_json::Value;
+use utils::navigator::EventEmitter;
+use utils::add_class_to_widget;
+use serde_json::Value;
+use gtk;
+
+use gtk::ScrolledWindowExt;
+use gtk::ContainerExt;
+use gtk::WidgetExt;
+use gtk::BoxExt;
 
 pub struct Reader<'a> {
-  events: Rc<UnsafeCell<EventEmitter>>,
+  events: Rc<RefCell<EventEmitter>>,
   container: gtk::Box,
   content: gtk::Box,
   title: String,
@@ -19,41 +22,30 @@ pub struct Reader<'a> {
 }
 
 impl <'a>Reader<'a> {
-  pub fn new(events: &Rc<UnsafeCell<EventEmitter>>) -> Reader<'a> {
-    use gtk::ScrolledWindowExt;
-    use gtk::StyleContextExt;
-    use gtk::ContainerExt;
-    use gtk::WidgetExt;
-    use gtk::BoxExt;
-
+  pub fn new(events: Rc<RefCell<EventEmitter>>) -> Reader<'a> {
     let container = gtk::Box::new(gtk::Orientation::Vertical, 0);
-    let context = container.get_style_context().unwrap();
-    context.add_class("page");
-    context.add_class("reader");
+    add_class_to_widget(&container, "reader");
+    add_class_to_widget(&container, "page");
 
     let scrolled = gtk::ScrolledWindow::new(None, None);
     scrolled.set_policy(gtk::PolicyType::Automatic, gtk::PolicyType::Automatic);
 
     let content = gtk::Box::new(gtk::Orientation::Vertical, 0);
-    // let content_context = content.get_style_context().unwrap();
-    // content_context.add_class("too-big-box");
+    // add_class_to_widget(&content, "too-big-box");
 
     scrolled.add(&content);
-
     container.pack_start(&scrolled, true, true, 0);
 
     Reader {
       title: String::from("Reader"),
-      events: events.clone(),
       name: "reader",
       container,
-      content
+      content,
+      events
     }
   }
 
   fn clear_content(&self) {
-    use gtk::ContainerExt;
-
     let childs = self.content.get_children();
     for child in childs {
       self.content.remove(&child);
@@ -61,12 +53,11 @@ impl <'a>Reader<'a> {
   }
 
   fn get_article(&self, name: String) {
-    use gtk::WidgetExt;
-    use gtk::BoxExt;
-
     // Next need add error handle
     match Article::new_from_title(name.clone()) {
-      Err(_) => {},
+      Err(_) => {
+        // TODO: Adding handle view if get error
+      },
       Ok(article) => {
         let nodes = self.get_nodes(article, name.clone());
         
@@ -82,19 +73,10 @@ impl <'a>Reader<'a> {
   }
 
   fn get_nodes(&self, article: Article, title: String) -> gtk::Box {
-    use gtk::StyleContextExt;
-    use gtk::WidgetExt;
-    use gtk::BoxExt;
-
-    let section_one = article.content[0].clone();
-    render_section_node(section_one);
-
     let container = gtk::Box::new(gtk::Orientation::Vertical, 0);
-    println!("{}", &article.content);
 
     let article_title = gtk::Label::new(&title[..]);
-    let title_context = article_title.get_style_context().unwrap();
-    title_context.add_class("page-title");
+    add_class_to_widget(&article_title, "page-title");
     
     container.pack_start(&article_title, false, true, 0);
     self.page_content(&container, &article.content);
@@ -103,16 +85,16 @@ impl <'a>Reader<'a> {
 }
 
 impl <'a>View for Reader<'a> {
-  fn get_content(&self) -> &gtk::Box {
-    &self.container
+  fn get_content(&self) -> gtk::Box {
+    self.container.clone()
   }
 
-  fn get_name(&self) -> &str {
-    self.name
+  fn get_name(&self) -> String {
+    String::from(self.name)
   }
 
-  fn get_title(&self) -> &str {
-    &self.title[..]
+  fn get_title(&self) -> String {
+    self.title.clone()
   }
 
   fn on_receive_event(&self, event: Event) {

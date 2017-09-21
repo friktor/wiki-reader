@@ -1,20 +1,12 @@
-extern crate inflections;
-extern crate gdk_pixbuf;
-extern crate gtk;
-
-use self::inflections::case::to_lower_case;
-use self::gdk_pixbuf::{ Pixbuf };
+use inflections::case::to_lower_case;
 use utils::add_class_to_widget;
-use utils::wiki::WikiResource;
-
-use std::cell::{ RefCell };
-use std::ops::FnMut;
-use std::rc::Rc;
+use gdk_pixbuf::Pixbuf;
+use gtk;
 
 pub struct WikiSwitcher {
-  pub button: Rc<RefCell<gtk::Button>>,
-  pub list: Rc<RefCell<gtk::ListBox>>,
-  popover: Rc<RefCell<gtk::Popover>>,
+  pub button: gtk::Button,
+  pub list: gtk::ListBox,
+  popover: gtk::Popover,
 }
 
 impl WikiSwitcher {
@@ -32,9 +24,9 @@ impl WikiSwitcher {
     popover.add(&list);
 
     WikiSwitcher {
-      popover: Rc::new(RefCell::new(popover)),
-      button: Rc::new(RefCell::new(button)),
-      list: Rc::new(RefCell::new(list)),
+      popover,
+      button,
+      list
     }
   }
 
@@ -45,12 +37,11 @@ impl WikiSwitcher {
     let popover = self.popover.clone();
     let button = self.button.clone();
 
-    button.borrow().connect_clicked(move |event| {
-      let menu = popover.borrow();
-      if menu.get_visible() {
-        menu.hide();
+    button.connect_clicked(move |_| {
+      if popover.get_visible() {
+        popover.hide();
       } else {
-        menu.show_all();
+        popover.show_all();
       }
     });
   }
@@ -86,22 +77,22 @@ impl WikiSwitcher {
       row.pack_start(&label, false, false, 0);
 
       let index = i as i32;
-      list.borrow().insert(&row, index);
+      list.insert(&row, index);
     }
 
     // Set Lurkmore default row
-    if let Some(row) = list.borrow().get_row_at_index(1) {
-      list.borrow().select_row(Some(&row));
+    if let Some(row) = list.get_row_at_index(1) {
+      list.select_row(Some(&row));
     }
 
     // Connect to selected for change button label
-    list.borrow().connect_row_selected(move |list, selected| {
+    list.connect_row_selected(move |_, selected| {
       let row = selected.clone().unwrap();
       let selected_index = row.get_index();
 
       match selected_index {
-        0 => button.borrow().set_label("Wikipedia"),
-        1 => button.borrow().set_label("Lurkmore"),
+        0 => button.set_label("Wikipedia"),
+        1 => button.set_label("Lurkmore"),
         _ => {}
       }
     });

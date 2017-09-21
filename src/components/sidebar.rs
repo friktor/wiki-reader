@@ -1,25 +1,36 @@
-extern crate inflections;
-extern crate gdk_pixbuf;
-extern crate gtk;
-
-use self::inflections::case::to_lower_case;
-use utils::navigator::{ Navigator };
-use self::gdk_pixbuf::{ Pixbuf };
+use inflections::case::to_lower_case;
+use utils::navigator::EventEmitter;
 use utils::add_class_to_widget;
-use utils::traits::{ Event };
-use std::cell::UnsafeCell;
+use utils::traits::Event;
+use gdk_pixbuf::Pixbuf;
+use std::cell::RefCell;
 use std::rc::Rc;
+use gtk;
+
+use gtk::ContainerExt;
+use gtk::RevealerExt;
+use gtk::BoxExt;
 
 pub struct AppSidebar {
-  container: Rc<UnsafeCell<gtk::Revealer>>,
-  content: Rc<UnsafeCell<gtk::Box>>
+  events: Rc<RefCell<EventEmitter>>,
+  pub container: gtk::Revealer,
+  pub content: gtk::Box
 }
 
 impl AppSidebar {
-  fn get_menu_button(name: &str) -> gtk::Button {
-    use gtk::ContainerExt;
-    use gtk::BoxExt;
+  pub fn new(events: Rc<RefCell<EventEmitter>>) -> AppSidebar {
+    let sidebar = AppSidebar::get_sidebar();
+    let content = AppSidebar::get_sidebar_content();
+    sidebar.add(&content);
 
+    AppSidebar {
+      container: sidebar,
+      content,
+      events,
+    }
+  }
+
+  fn get_menu_button(name: &str) -> gtk::Button {
     let text = to_lower_case(&name);
 
     let button = gtk::Button::new();
@@ -58,8 +69,6 @@ impl AppSidebar {
   }
 
   fn get_sidebar_header() -> gtk::Box {
-    use gtk::BoxExt;
-
     let header = gtk::Box::new(gtk::Orientation::Vertical, 0);
     header.set_baseline_position(gtk::BaselinePosition::Center);
     add_class_to_widget(&header, "sidebar-header");
@@ -76,7 +85,6 @@ impl AppSidebar {
   }
 
   fn get_sidebar() -> gtk::Revealer {
-    use gtk::RevealerExt;
     let sidebar = gtk::Revealer::new();
 
     sidebar.set_transition_type(gtk::RevealerTransitionType::SlideLeft);
@@ -87,30 +95,10 @@ impl AppSidebar {
     return sidebar;
   }
 
-  pub fn new() -> AppSidebar {
-    use gtk::ContainerExt;
-
-    let sidebar = AppSidebar::get_sidebar();
-    let content = AppSidebar::get_sidebar_content();
-    sidebar.add(&content);
-
-    AppSidebar {
-      container: Rc::new(UnsafeCell::new(sidebar)),
-      content: Rc::new(UnsafeCell::new(content)),
-    }
-  }
-
-  unsafe fn setup_buttons(&self, navigator: &Rc<UnsafeCell<Navigator>>) {
-    use gtk::StyleContextExt;
-    use gtk::WidgetExt;
-    use gtk::BoxExt;
-
+  fn setup_buttons(&self) {
     let items: [&str; 3] = [ "Home", "Settings", "About"];
-    let navigator_ref = navigator.get();
-    let content = self.content.get();
-
-    let events_ref = (*navigator_ref).get_events();
-    let events = events_ref.get();
+    let content = self.content.clone();
+    let events = self.events.clone();
 
     let list = gtk::Box::new(gtk::Orientation::Vertical, 0);
     add_class_to_widget(&list, "menu-list");
@@ -120,37 +108,26 @@ impl AppSidebar {
       list.pack_start(&button, false, false, 0);
     }
 
-    (*content).pack_start(&list, false, false, 0);
+    content.pack_start(&list, false, false, 0);
   }
 
-  unsafe fn subscribe_event(&self, navigator: &Rc<UnsafeCell<Navigator>>) {
-    use gtk::RevealerExt;
+  fn subscribe_event(&self) {
+    let sidebar = self.container.clone();
+    let events = self.events.clone();
 
-    let navigator_ref = navigator.get();
-    let sidebar = self.container.get();
-
-    let events_ref = (*navigator_ref).get_events();
-    let events = events_ref.get();
-
-    (*events).subscribe(move |event| {
+    events.borrow_mut().subscribe(move |event| {
       match event {
         Event::ToggleSidebar => {
-          let status = (*sidebar).get_reveal_child();
-          (*sidebar).set_reveal_child(!status);
+          let status = sidebar.get_reveal_child();
+          sidebar.set_reveal_child(!status);
         },
         _ => {}
       }
     });
   }
 
-  pub fn setup(&self, navigator: &Rc<UnsafeCell<Navigator>>) {
-    unsafe {
-      self.setup_buttons(navigator);
-      self.subscribe_event(navigator);
-    }
-  }
-
-  pub fn get_content(&self) -> &Rc<UnsafeCell<gtk::Revealer>> {
-    return &self.container;
+  pub fn setup(&self) {
+    self.setup_buttons();
+    self.subscribe_event();
   }
 }
