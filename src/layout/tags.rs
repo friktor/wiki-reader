@@ -21,7 +21,6 @@ fn link_tag() -> gtk::TextTag {
 
 fn heading_tag() -> gtk::TextTag {
   let tag = gtk::TextTag::new(Some("heading"));
-  tag.set_property_weight(600);
   tag.set_property_size(25);
   tag
 }
@@ -34,6 +33,37 @@ fn text_tag() -> gtk::TextTag {
 fn bold_tag() -> gtk::TextTag {
   let tag = gtk::TextTag::new(Some("b"));
   tag.set_property_weight(600);
+  tag
+}
+
+fn list_tag() -> gtk::TextTag {
+  let tag = gtk::TextTag::new(Some("li"));
+  tag
+}
+
+fn del_tag() -> gtk::TextTag {
+  let tag = gtk::TextTag::new(Some("del"));
+  tag
+}
+
+fn ref_tag() -> gtk::TextTag {
+  let tag = gtk::TextTag::new(Some("ref"));
+  tag
+}
+
+fn references_tag() -> gtk::TextTag {
+  let tag = gtk::TextTag::new(Some("references"));
+  tag
+}
+
+fn sub_tag() -> gtk::TextTag {
+  let tag = gtk::TextTag::new(Some("sub"));
+  tag
+}
+
+fn italic_tag() -> gtk::TextTag {
+  let tag = gtk::TextTag::new(Some("i"));
+  tag.set_property_style(pango::Style::Italic);
   tag
 }
 
@@ -50,5 +80,23 @@ pub fn apply_tags(buffer: &gtk::TextBuffer) {
 
     let bold = bold_tag();
     table.add(&bold);
+
+    let list = list_tag();
+    table.add(&list);
+
+    let del = del_tag();
+    table.add(&del);
+
+    let ref_t = ref_tag();
+    table.add(&ref_t);
+
+    let sub = sub_tag();
+    table.add(&sub);
+
+    let italic = italic_tag();
+    table.add(&italic);
+
+    let references = references_tag();
+    table.add(&references);
   }
 }

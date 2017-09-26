@@ -12,6 +12,7 @@ for line in sys.stdin:
   text += line
 
 formatted = format_ast.parse(text)
-inline = inline_ast.parse(formatted)
+# sys.stdout.write(json.dumps(formatted))
 
+inline = inline_ast.parse(formatted)
 sys.stdout.write(json.dumps(inline))

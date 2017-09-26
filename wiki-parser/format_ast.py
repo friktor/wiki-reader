@@ -20,6 +20,8 @@ def w_wikilink(link):
     result["type"] = "filelink"
   else:
     result["type"] = "wikilink"
+    if link.text:
+      result["text"] = str(link.text)
 
   if (link.text):
     result["text"] = str(link.text)
@@ -27,7 +29,7 @@ def w_wikilink(link):
 
 def w_heading(heading):
   return {
-    "title": str(heading.title),
+    "title": str(heading.title).strip(),
     "wikicode": str(heading),
     "level": heading.level,
     "type": "heading",
@@ -35,19 +37,22 @@ def w_heading(heading):
 
 def w_tag(tag):
   result = {
-    "closing_wiki_markup": str(tag.closing_wiki_markup),
     "closing_tag": str(tag.closing_tag),
     "self_closing": tag.self_closing,
-    "wikicode": str(tag.contents),
     "attributes": tag.attributes,
     "implicit": tag.implicit,
     "type": "tag"
   }
 
+  if tag.closing_wiki_markup:
+    result["closing_wiki_markup"] = str(tag.closing_wiki_markup),
+
   if tag.contents:
     result["properties"] = block(tag.contents)
+    result["wikicode"] = str(tag.contents)
   else:
     result["properties"] = []
+    result["wikicode"] = ""
   
   return result
 
@@ -69,7 +74,8 @@ def w_template(template):
     else:
       result["content"].append({
         "properties": block(param.value),
-        "wikicode": str(param)
+        "wikicode": str(param),
+        "type": "section"
       })
   
   return result
@@ -87,8 +93,8 @@ def block(section):
   _links = [w_link(link) for link in links]
   _tags = [w_tag(tag) for tag in tags]
 
-  return _wikilinks + _templates + _headings + _links + _tags
-
+  result = _wikilinks + _templates + _headings + _links + _tags
+  return result
 
 def formating(section, node_type="section"):
   return {

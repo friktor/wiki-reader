@@ -103,6 +103,33 @@ def inline_section(section):
 
   return splitted
 
+
+def clean_section(section):
+  def filter_node(node):
+    if node["type"] == "text":
+      text = node["text"]
+      return len(text) > 0 and text != "\n"
+    
+    if node["type"] == "tag":
+      return node["closing_tag"] != "li"
+
+    if node["type"] in ["template", "heading"]:
+      del node["wikicode"]
+
+    return True
+
+  for index, paragraph in enumerate(section):
+    for node in paragraph:
+      if node["type"] == "text":
+        text = node["text"]
+        text = text.replace("'''", '')
+        node["text"] = text
+
+    section[index] = [node for node in paragraph if filter_node(node)]
+
+  return section
+
 def parse(ast):
   sections = [inline_section(section) for section in ast]
-  return sections
+  cleaned = [clean_section(section) for section in sections]
+  return cleaned

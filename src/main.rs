@@ -25,6 +25,7 @@ use app::Application;
 use gtk::WindowExt;
 use gtk::WidgetExt;
 use gio::Resource;
+use std::env::args;
 
 pub fn load_resource() {
   match Resource::load("./bundles/bundle.gresource") {
@@ -54,5 +55,7 @@ fn main() {
     }
   });
 
-  wiki_reader_app.run(&[]);
+  wiki_reader_app.run(&[
+    "--g-fatal-warnings"
+  ]);
 }

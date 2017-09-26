@@ -95,7 +95,7 @@ impl Article {
       break;
     }
 
-    let result = match Article::get_wikicode_ast(wikicode.clone()) {
+    let result = match Article::get_wikicode_ast(String::from(wikicode.trim())) {
       Err(reason) => return Err(reason),
       Ok(ast) => {
         let mut content = Tree::new(ast.clone());
