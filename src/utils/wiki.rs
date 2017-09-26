@@ -5,6 +5,9 @@ use std::io::prelude::*;
 use std::error::Error;
 use reqwest::get;
 use url::Url;
+use gtk;
+
+use layout::tree::Tree;
 
 #[derive(Clone)]
 pub enum ErrorReason {
@@ -23,6 +26,7 @@ pub enum WikiResource {
 #[derive(Clone)]
 pub struct Article {
   pub wikicode: String,
+  pub layout: gtk::Box,
   pub content: Value,
   pub title: String,
   pub page_id: i64,
@@ -93,11 +97,17 @@ impl Article {
 
     let result = match Article::get_wikicode_ast(wikicode.clone()) {
       Err(reason) => return Err(reason),
-      Ok(ast) => Article {
-        content: ast,
-        wikicode,
-        page_id,
-        title
+      Ok(ast) => {
+        let mut content = Tree::new(ast.clone());
+        content.setup();
+        
+        Article {
+          layout: content.layout.clone(),
+          content: ast,
+          wikicode,
+          page_id,
+          title
+        }
       }
     };
 

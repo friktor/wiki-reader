@@ -30,3 +30,11 @@ http://lurkmore.to/api.php
   &prop=imageinfo
   &format=json
   &iiprop=timestamp|user|url
+
+
+# Next features
+- Writing new styles for native view in mac os & gnome
+- Adding hotreloading styles handler for debug mode
+- Button with selection previous articles
+- Creating named article bookmarks group
+  - adding saving tagged selection in articles

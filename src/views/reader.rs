@@ -58,29 +58,12 @@ impl <'a>Reader<'a> {
       Err(_) => {
         // TODO: Adding handle view if get error
       },
-      Ok(article) => {
-        let nodes = self.get_nodes(article, name.clone());
-        
+      Ok(article) => {        
         self.clear_content();
-        self.content.pack_start(&nodes, false, true, 0);
+        self.content.pack_start(&article.layout, false, true, 0);
         self.content.show_all();
       }
     }
-  }
-
-  fn page_content(&self, container: &gtk::Box, content: &Value) {
-    
-  }
-
-  fn get_nodes(&self, article: Article, title: String) -> gtk::Box {
-    let container = gtk::Box::new(gtk::Orientation::Vertical, 0);
-
-    let article_title = gtk::Label::new(&title[..]);
-    add_class_to_widget(&article_title, "page-title");
-    
-    container.pack_start(&article_title, false, true, 0);
-    self.page_content(&container, &article.content);
-    container
   }
 }
 

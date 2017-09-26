@@ -5,6 +5,7 @@ extern crate inflections;
 extern crate serde_json;
 extern crate gdk_pixbuf;
 extern crate reqwest;
+extern crate pango;
 extern crate gio;
 extern crate gtk;
 extern crate gdk;
@@ -12,7 +13,7 @@ extern crate url;
 
 pub mod controllers;
 pub mod components;
-pub mod contents;
+pub mod layout;
 pub mod utils;
 pub mod views;
 mod app;

@@ -27,6 +27,10 @@ def props_ranges(properties, source):
         ranged_content.append(node_section)
       
       property["content"] = ranged_content
+    
+    if prop_type == "tag":
+      node_section = inline_section(property)
+      property["content"] = node_section
 
     ranges.append((s, e, property))
   
@@ -86,7 +90,7 @@ def inline_section(section):
   wikicode = section["wikicode"]
 
   if len(properties) is 0:
-    node = (0, 0, { "type": "text", "text": wikicode })
+    node = (0, 0, [{ "type": "text", "text": wikicode }])
     return extract_content_node(node)
 
   p_ranges = props_ranges(properties, wikicode)

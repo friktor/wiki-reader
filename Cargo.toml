@@ -5,14 +5,11 @@ authors = ["Anton Shramko <antonshramko@yandex.ru>"]
 
 [dependencies]
 serde_json = "1.0"
-matches = "0.1.6"
 serde_derive = "*"
-inflections = "*"
-env_logger = "0.3"
-base64 = "0.6.0"
-mowl = "1.1.0"
 serde = "*"
+inflections = "*"
 gdk-pixbuf = "0.2"
+pango = "0.2.0"
 glib = "0.3"
 gio = "0.2"
 gdk = "0.6"

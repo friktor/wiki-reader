@@ -15,8 +15,8 @@ def w_wikilink(link):
     "wikicode": str(link)
   }
 
-  matching_file = re.compile("$(File|Файл):", re.IGNORECASE)
-  if re.fullmatch(matching_file, result["title"]):
+  matching_file = re.compile("^(File|Файл):.*$")
+  if matching_file.fullmatch(result["title"]):
     result["type"] = "filelink"
   else:
     result["type"] = "wikilink"
@@ -35,15 +35,19 @@ def w_heading(heading):
 
 def w_tag(tag):
   result = {
+    "closing_wiki_markup": str(tag.closing_wiki_markup),
+    "closing_tag": str(tag.closing_tag),
+    "self_closing": tag.self_closing,
+    "wikicode": str(tag.contents),
     "attributes": tag.attributes,
-    "wikicode": str(tag),
+    "implicit": tag.implicit,
     "type": "tag"
   }
 
-  if not tag.contents:
-    result["content"] = str(tag)
+  if tag.contents:
+    result["properties"] = block(tag.contents)
   else:
-    result["content"] = block(tag.contents)
+    result["properties"] = []
   
   return result
 
@@ -86,11 +90,11 @@ def block(section):
   return _wikilinks + _templates + _headings + _links + _tags
 
 
-def formating(section):
+def formating(section, node_type="section"):
   return {
     "properties": block(section),
     "wikicode": str(section),
-    "type": "section"
+    "type": node_type
   }
 
 def parse(wikicode):
