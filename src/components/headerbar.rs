@@ -32,26 +32,12 @@ impl AppHeaderBar {
   }
 
   // Set icons in ui
-  fn setup_icons(&self) {
-    let icons: [&str; 2] = ["menu", "search"]; // "home", "reader", 
-    
-    for name in &icons {
-      let query = format!("btn-{}-image", &name);
-      let element: gtk::Image = self.builder.get_object(&query).unwrap();      
+  fn setup_childs(&self) {
+    let actions: gtk::Box = self.builder.get_object("actions").unwrap();
+    let tabs: gtk::Box = self.builder.get_object("tabs").unwrap();
 
-      let path = format!("/org/gtk/wikireader/images/{}.png", &name);
-      let image = Pixbuf::new_from_resource_at_scale(&path, 20, 20, false).unwrap();
-      element.set_from_pixbuf(Some(&image));
-    }
-  }
-
-  fn setup_toggle_sidebar(&self) {
-    let button: gtk::Button = self.builder.get_object("toggle_sidebar").unwrap();
-    let events = self.events.clone();
-
-    button.connect_clicked(move |_| {
-      events.borrow_mut().push(Event::ToggleSidebar);
-    });
+    self.headerbar.pack_start(&tabs);
+    self.headerbar.pack_end(&actions);
   }
 
   fn setup_search(&self) {
@@ -82,9 +68,8 @@ impl AppHeaderBar {
   }
 
   pub fn setup(&self) {
-    self.setup_toggle_sidebar();
     self.subscribe_event();
     self.setup_search();
-    self.setup_icons();
+    self.setup_childs();
   }
 }

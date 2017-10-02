@@ -1,4 +1,6 @@
 .home
+  background-image: url('resource:///org/gtk/wikireader/images/home-bg.jpeg')
+  background-size: cover
   padding-bottom: 0
   padding-top: 50px
 
@@ -6,20 +8,24 @@
     margin-top: 25px
 
   .search
-    margin: 30px 50px
+    box-shadow: 0 0 4px transparentize(#000, 0.85)
+    margin: 30px 50px 15px 50px
+    border-radius: 35px
 
     .input
+      background-color: transparentize(#FFF, 0.2)
       color: transparentize(#000, 0.25)
-      border-bottom-right-radius: 0
-      border-top-right-radius: 0
-      background-color: #EEEEEE
+      border-radius: 35px 0 0 35px
       padding: 10px 12px
       font-size: 13px
       border: none
+
+      &:focus
+        background-color: #FFF
+        border-width: 0
     
     .button
-      border-bottom-left-radius: 0
-      border-top-left-radius: 0
+      border-radius: 0 35px 35px 0
       background-color: #03A9F4
       padding: 10px 12px
       font-size: 12px
@@ -27,13 +33,13 @@
       color: #FFF
 
   .label-info
-    color: transparentize(#000, 0.6)
-    font-size: 13px
+    text-shadow: 1px 1px 5px transparentize(#000, 0.5)
+    font-size: 15px
+    color: #FFF
   
   .button-wiki-switcher
-    background-color: transparentize(#EBEBEB, 0.3)
-    color: transparentize(#000, 0.3)
-    border-radius: 40px 40px 0 0
-    padding: 10px 15px
+    background-color: transparentize(#F5F5F5, 0.1)
+    color: transparentize(#000, 0.2)
+    border-radius: 0
     font-size: 15px
     border: none

@@ -3,6 +3,15 @@ doctype xml
 interface
   requires(lib="gtk+" version="3.20")/
 
+  object(class="GtkButton" id="button-search")
+    property(name="receives_default") True
+    property(name="can_focus") True
+    property(name="visible") True
+    style: class(name="button")/
+    child: object(class="GtkImage" id="search-image")
+      property(name="icon-size") 1
+      property(name="visible") 1
+
   object(class="GtkBox" id="page_home")
     property(name="orientation") vertical
     property(name="can_focus") True
@@ -21,7 +30,7 @@ interface
         property(name="fill") False
 
     child
-      object(class="GtkBox")
+      object(class="GtkBox" id="search-box")
         property(name="can_focus") True
         property(name="visible") True
         style: class(name="search")/
@@ -38,20 +47,6 @@ interface
             property(name="expand") True
             property(name="position") 0
             property(name="fill") True
-
-        child
-          object(class="GtkButton" id="button-search")
-            property(name="receives_default") True
-            property(name="can_focus") True
-            property(name="visible") True
-            style: class(name="button")/
-            child: object(class="GtkImage" id="search-image")
-              property(name="icon-size") 1
-              property(name="visible") 1
-          packing
-            property(name="expand") False
-            property(name="position") 1
-            property(name="fill") False
 
       packing
         property(name="expand") False

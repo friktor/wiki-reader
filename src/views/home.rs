@@ -96,7 +96,12 @@ impl <'a>Home<'a> {
 
     // Pack popover switcher to end
     let button = self.wiki_switcher.button.clone();
-    self.content.pack_end(&button, false, false, 0);
+    
+    let search_button: gtk::Button = self.builder.get_object("button-search").unwrap();
+    let search_box: gtk::Box = self.builder.get_object("search-box").unwrap();
+    
+    search_box.pack_start(&button, false, true, 0);
+    search_box.pack_start(&search_button, false, true, 0);
   }
 
   fn prepare_search_action(&self) {
@@ -130,8 +135,8 @@ impl <'a>View for Home<'a> {
   }
 
   fn setup(&mut self) {
-    self.prepare_images();
     self.prepare_switcher();
+    self.prepare_images();
     self.prepare_search_action();
   }
 }

@@ -2,52 +2,71 @@ doctype xml
 
 interface
   requires(lib="gtk+" version="3.20")/
+
+  object(class="GtkBox" id="tabs")
+    property(name="visible") 1
+    style: class(name="page-tabs")/
+  
+    child
+      object(class="GtkRadioButton" id="page-tabs")
+        style: class(name="image-button")/
+        property(name="draw-indicator") 0
+        property(name="group") page-tabs
+        property(name="label") Home
+        property(name="visible") 1
+        property(name="active") 1
+      packing
+        property(name="expand") False
+        property(name="fill") False
+        property(name="position") 1
+      
+    child
+      object(class="GtkRadioButton" id="btn-tab-reader")
+        style: class(name="image-button")/
+        property(name="draw-indicator") 0
+        property(name="group") page-tabs
+        property(name="label") Reader
+        property(name="visible") 1
+        property(name="active") 0
+      packing
+        property(name="expand") False
+        property(name="fill") False
+        property(name="position") 1
+    
+    child
+      object(class="GtkRadioButton" id="btn-tab-about")
+        style: class(name="image-button")/
+        property(name="draw-indicator") 0
+        property(name="group") page-tabs
+        property(name="label") About
+        property(name="visible") 1
+        property(name="active") 0
+      packing
+        property(name="expand") False
+        property(name="fill") False
+        property(name="position") 1
+
+
+  object(class="GtkBox" id="actions")
+    property(name="baseline-position") center
+    property(name="visible") 1
+    child
+      object(class="GtkEntry" id="search_input")
+        style: class(name="headerbar-search")/
+        property(name="placeholder-text") Search
+        property(name="activates-default") True
+        property(name="can_focus") True
+        property(name="editable") True
+        property(name="visible") True
+        
+      packing
+        property(name="expand") False
+        property(name="fill") False
+        property(name="position") 1
+
   
   object(class="GtkHeaderBar" id="app_headerbar")
     style: class(name="app-headerbar")/
     property(name="show_close_button") True
     property(name="can_focus") False
     property(name="visible") True
-    
-    child
-      object(class="GtkBox")
-        property(name="baseline-position") center
-        property(name="visible") 1
-        child
-          object(class="GtkButton" id="toggle_sidebar")
-            property(name="receives_default") True
-            property(name="can_focus") True
-            property(name="visible") True
-            style: class(name="menu-button")/
-            
-            child: object(class="GtkImage" id="btn-menu-image")
-              property(name="icon-size") 1
-              property(name="visible") 1
-          
-          packing
-            property(name="expand") False
-            property(name="fill") False
-            property(name="position") 0
-        
-        child
-          object(class="GtkEntry" id="search_input")
-            style: class(name="headerbar-search")/
-            property(name="activates-default") True
-            property(name="can_focus") True
-            property(name="editable") True
-            property(name="visible") True
-            
-          packing
-            property(name="expand") False
-            property(name="fill") False
-            property(name="position") 1
-        
-        child
-          object(class="GtkImage" id="btn-search-image")
-            property(name="icon-size") 1
-            property(name="visible") 1
-          
-          packing
-            property(name="expand") False
-            property(name="fill") False
-            property(name="position") 2

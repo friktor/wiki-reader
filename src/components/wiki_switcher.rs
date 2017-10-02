@@ -18,7 +18,7 @@ impl WikiSwitcher {
     add_class_to_widget(&button, "button-wiki-switcher");
     
     let popover = gtk::Popover::new(Some(&button));
-    popover.set_position(gtk::PositionType::Top);
+    popover.set_position(gtk::PositionType::Bottom);
 
     let list = gtk::ListBox::new();
     popover.add(&list);

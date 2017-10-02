@@ -23,9 +23,8 @@ impl Application {
   pub fn new() -> Application {
     let builder = gtk::Builder::new_from_resource("/org/gtk/wikireader/ui/app.xml");
     let window: gtk::Window = builder.get_object("app_window").unwrap();
-    let settings = gtk::Settings::get_default().unwrap();
-
     let navigator = Rc::new(RefCell::new(Navigator::new()));
+    let settings = gtk::Settings::get_default().unwrap();
 
     let headerbar = AppHeaderBar::new(navigator.borrow().get_events());
     headerbar.setup();
@@ -74,8 +73,9 @@ impl Application {
   }
 
   fn setup_settings(&self) {
-    self.settings.set_property_gtk_enable_animations(true);
+    self.settings.set_property_gtk_decoration_layout(Some("close")); // remove window controls
     self.settings.set_property_gtk_theme_name(Some("Arc-Dark"));
+    self.settings.set_property_gtk_enable_animations(true);
 
     let screen = Screen::get_default().unwrap();
     let provider = gtk::CssProvider::new();

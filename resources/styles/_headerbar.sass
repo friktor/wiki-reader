@@ -1,14 +1,71 @@
-.titlebar.app-headerbar
+headerbar.titlebar.app-headerbar
+  border-radius: 2px 2px 0 0
+  background-color: #222222
+  padding-right: 14px
+  padding-left: 14px
+  min-height: 38px
+
+  separator
+    opacity: 0
+
   .title
     text-shadow: 0 2px 3px rgba(0,0,0, 0.2)
     color: transparentize(#FFF, 0.25)
     font-weight: 400
-    font-size: 15px
+    font-size: 16px
+
+  .page-tabs
+    .radio
+      background-color: transparent
+      transition: all 0.2s ease
+      border-radius: 0
+      font-size: 12px
+      border-width: 0
+      border-bottom: 2px solid transparent
+
+      &:hover
+        border-bottom: 1px solid transparentize(#FFF, 0.98)
+        background-color: transparentize(#FFF, 0.9)
+      &:checked
+        border-bottom: 2px solid #FFF
 
   .headerbar-search
+    background-color: transparentize(#FFF, 0.65)
     transition: all 0.2s ease
-    margin-left: 10px
-    margin-right: 5px
-    
+    border-radius: 12px
+    padding: 2px 10px
+    border-width: 0
+    margin: 8px 0
+    color: #FFF
+
     &:focus
-      min-width: 250px
+      color: transparentize(#000, 0.2)
+      background-color: #FFF
+      min-width: 200px
+      border-width: 0
+
+// Clearfix size of headerbar
+window.ssd headerbar.titlebar
+  padding-bottom: 1px
+  padding-top: 1px
+  min-height: 0
+
+window.ssd headerbar.titlebar button.titlebutton
+  padding-bottom: 0px
+  padding-top: 0px
+  min-height: 0
+
+headerbar entry,
+headerbar spinbutton,
+headerbar button,
+headerbar separator
+  margin-bottom: 0px
+  margin-top: 0px
+
+.default-decoration
+  min-height: 0
+  padding: 0px
+
+.default-decoration .titlebutton
+  min-height: 26px
+  min-width: 26px
