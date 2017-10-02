@@ -1,5 +1,4 @@
 # TODO
-- Moving String to &str conversions from _&my[..]_ to _&*my_
 - Adding i18n to project
 - Adding progressive searched home page
   - popover selection of target resources

@@ -10,9 +10,9 @@
     <file>images/wikipedia-logo.png</file>
     <file>images/lurkmore-logo.png</file>
 
-    <file compressed="true">c_ui/app.xml</file>
-    <file compressed="true">c_ui/pages.xml</file>
-    <file compressed="true">c_ui/headerbar.xml</file>
-    <file compressed="true">c_ui/home.xml</file>
+    <file compressed="true">ui/app.xml</file>
+    <file compressed="true">ui/pages.xml</file>
+    <file compressed="true">ui/headerbar.xml</file>
+    <file compressed="true">ui/home.xml</file>
   </gresource>
 </gresources>

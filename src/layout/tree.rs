@@ -49,8 +49,6 @@ pub struct Tree {
 
 impl Tree {
   pub fn new(tree: Value) -> Tree {
-    // println!("{}\n\n", &tree);
-
     Tree {
       layout: gtk::Box::new(gtk::Orientation::Vertical, 0),
       ranges: vec![],

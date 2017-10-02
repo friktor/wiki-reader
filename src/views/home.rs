@@ -28,7 +28,7 @@ pub struct Home<'a> {
 
 impl <'a>Home<'a> {
   pub fn new(events: Rc<RefCell<EventEmitter>>) -> Home<'a> {
-    let builder = gtk::Builder::new_from_resource("/org/gtk/wikireader/c_ui/home.xml");
+    let builder = gtk::Builder::new_from_resource("/org/gtk/wikireader/ui/home.xml");
     let content: gtk::Box = builder.get_object("page_home").unwrap();
     let wiki_switcher = WikiSwitcher::new();
 

@@ -19,7 +19,7 @@ pub struct AppHeaderBar {
 
 impl AppHeaderBar {
   pub fn new(events: Rc<RefCell<EventEmitter>>) -> AppHeaderBar {
-    let builder = gtk::Builder::new_from_resource("/org/gtk/wikireader/c_ui/headerbar.xml");
+    let builder = gtk::Builder::new_from_resource("/org/gtk/wikireader/ui/headerbar.xml");
     let headerbar: gtk::HeaderBar = builder.get_object("app_headerbar").unwrap();
     let search: gtk::Entry = builder.get_object("search_input").unwrap();
 

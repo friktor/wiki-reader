@@ -3,11 +3,9 @@
 Cargo.lock
 **/*.gresource
 /bundles/
-**/node_modules/
-**/c_ui/*.xml
-**/.nexe/
+**/ui/*.xml
 **/wiki-parser/mwparserfromhell/
 **/wiki-parser/__pycache__/
 **/wiki-parser/*.lock
 **/wiki-parser/*.log
-.vscode/
+/.vscode/
