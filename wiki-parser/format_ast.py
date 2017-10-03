@@ -29,7 +29,7 @@ def w_wikilink(link):
 
 def w_heading(heading):
   return {
-    "title": str(heading.title).strip(),
+    "title": str(heading.title),
     "wikicode": str(heading),
     "level": heading.level,
     "type": "heading",

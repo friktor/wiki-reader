@@ -99,7 +99,7 @@ impl Article {
       Err(reason) => return Err(reason),
       Ok(ast) => {
         let mut content = Tree::new(ast.clone());
-        content.setup();
+        content.setup(false);
         
         Article {
           layout: content.layout.clone(),
