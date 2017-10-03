@@ -3,6 +3,7 @@ use serde_json::{Value, Map};
 use layout::tree::Tree;
 use gtk;
 
+use gtk::WidgetExt;
 use gtk::BoxExt;
 
 pub struct Template {
@@ -18,14 +19,17 @@ impl Template {
     add_class_to_widget(&self.layout, &*self.name);
 
     match &*self.name {
-      "Q" => self.quote_setup(),
+      "Q" | "Цитата" => self.quote_setup(),
       _ => {}
     }
   }
 
   fn quote_setup(&self) {
-    for node in &self.content {
-      self.layout.pack_end(&node.layout, false, false, 0);
+    self.layout.set_halign(gtk::Align::End);
+
+    for (index, node) in self.content.iter().enumerate() {
+      if index == 1 { add_class_to_widget(&node.layout, "separated") }
+      self.layout.pack_start(&node.layout, false, false, 0);
     }
   }
 }
