@@ -1,4 +1,5 @@
 use utils::add_class_to_widget;
+use layout::template::Template;
 use layout::tags::apply_tags;
 use serde_json::Value;
 use gtk;
@@ -82,16 +83,19 @@ impl Tree {
       
     if let Some(nodes) = content_nodes {
       for node in nodes {
-        let buffer = textview.get_buffer().unwrap();
-        let end_iter = buffer.get_end_iter();
+        let node_type = node["type"].as_str().unwrap();
 
-        if let Some(node_type) = node["type"].as_str() {
-          if node_type != "template" {
+        match node_type {
+          "template" => {
+            // TODO: handle inline templates in tag
+          },
+          
+          "heading" => {},
+          
+          _ => {
             let (text, next_textview) = self.insert_text_node(node, textview.clone());
             tag_text.push_str(&*text);
             textview = next_textview;
-          } else {
-            // TODO: handle inline templates in tag
           }
         }
       }
@@ -156,20 +160,26 @@ impl Tree {
   }
 
   fn get_template_node(&mut self, template: &Value) -> gtk::Box {
-    let container = gtk::Box::new(gtk::Orientation::Vertical, 0);
+    let content_nodes = template["content"].as_array().unwrap();
+    let params = template["params"].as_object().unwrap();
     let name = template["name"].as_str().unwrap();
-    add_class_to_widget(&container, &*format!("{}-template", &name));
 
-    if let Some(nodes) = template["content"].as_array() {
-      for node in nodes {
-        let mut node = Tree::new(node.clone());
-        node.setup(true);
-
-        container.pack_start(&node.layout, false, true, 0);
-      }
+    let mut content: Vec<Tree> = vec![];
+    for node in content_nodes {
+      let mut node = Tree::new(node.clone());
+      node.setup(true);
+      content.push(node);
     }
 
-    container
+    let template = Template {
+      layout: gtk::Box::new(gtk::Orientation::Vertical, 0),
+      name: String::from(name),
+      params: params.clone(),
+      content
+    };
+
+    template.setup();
+    template.layout
   }
 
   fn render_section(&mut self, section: Vec<Value>) -> gtk::Box {
