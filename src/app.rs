@@ -1,6 +1,6 @@
 use components::headerbar::AppHeaderBar;
-use components::sidebar::AppSidebar;
 use utils::navigator::Navigator;
+use utils::get_resources_path;
 use utils::traits::Event;
 use std::cell::RefCell;
 use std::rc::Rc;
@@ -10,13 +10,11 @@ use gdk::Screen;
 use gtk;
 
 pub struct Application {
+  navigator: Rc<RefCell<Navigator>>,
   pub window: gtk::Window,
+  headerbar: AppHeaderBar,
   settings: gtk::Settings,
   builder: gtk::Builder,
-
-  navigator: Rc<RefCell<Navigator>>,
-  headerbar: AppHeaderBar,
-  sidebar: AppSidebar,
 }
 
 impl Application {
@@ -29,15 +27,10 @@ impl Application {
     let headerbar = AppHeaderBar::new(navigator.borrow().get_events());
     headerbar.setup();
 
-    let sidebar = AppSidebar::new(navigator.borrow().get_events());
-    sidebar.setup();
-    
     // final blocks
     Application {
       navigator,
       headerbar,
-      sidebar,
-
       settings,
       builder,
       window
@@ -50,10 +43,6 @@ impl Application {
     let events = navigator.borrow().get_events();
 
     navigator.borrow().setup();
-
-    // Sidebar prepares
-    let sidebar = self.sidebar.container.clone();
-    container.pack_start(&sidebar, false, true, 0);
 
     // Pages content prepare
     let stack = navigator.borrow().stack.clone();
@@ -73,13 +62,14 @@ impl Application {
   }
 
   fn setup_settings(&self) {
-    self.settings.set_property_gtk_decoration_layout(Some("close")); // remove window controls
-    self.settings.set_property_gtk_theme_name(Some("Arc-Dark"));
+    self.settings.set_property_gtk_theme_name(Some("Arc-Darker"));
     self.settings.set_property_gtk_enable_animations(true);
 
     let screen = Screen::get_default().unwrap();
     let provider = gtk::CssProvider::new();
-    provider.load_from_path("./bundles/main.css").unwrap();
+
+    let css_path = format!("{}/main.css", get_resources_path());
+    provider.load_from_path(&*css_path).unwrap();
 
     gtk::StyleContext::add_provider_for_screen(
       &screen, &provider,

@@ -2,7 +2,7 @@
 **/*.rs.bk
 Cargo.lock
 **/*.gresource
-/bundles/
+/assets/
 **/ui/*.xml
 **/wiki-parser/mwparserfromhell/
 **/wiki-parser/__pycache__/

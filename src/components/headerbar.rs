@@ -68,6 +68,8 @@ impl AppHeaderBar {
   }
 
   pub fn setup(&self) {
+    self.headerbar.set_decoration_layout(Some(""));
+    
     self.subscribe_event();
     self.setup_search();
     self.setup_childs();

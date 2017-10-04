@@ -25,10 +25,13 @@ use app::Application;
 use gtk::WindowExt;
 use gtk::WidgetExt;
 use gio::Resource;
-use std::env::args;
+
+use utils::get_resources_path;
 
 pub fn load_resource() {
-  match Resource::load("./bundles/bundle.gresource") {
+  let assets_path = format!("{}/assets.gresource", get_resources_path());
+
+  match Resource::load(&*assets_path) {
     Ok(resource) => { gio::resources_register(&resource) },
     Err(error) => { println!("{:?}", Error::description(&error)) }
   }
