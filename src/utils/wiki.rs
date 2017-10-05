@@ -1,6 +1,7 @@
 use serde_json::{ Value, from_str as json_from_str };
 use std::process::{ Command, Stdio };
 use std::collections::HashMap;
+use utils::get_parser_path;
 use std::io::prelude::*;
 use std::error::Error;
 use reqwest::get;
@@ -115,9 +116,7 @@ impl Article {
   }
 
   pub fn get_wikicode_ast(code: String) -> Result<Value, ErrorReason> {
-    let command = format!("./wiki-parser/main.py");
-
-    let process = match Command::new(&command[..])
+    let process = match Command::new(get_parser_path())
       .stdin(Stdio::piped())
       .stdout(Stdio::piped())
       .spawn() {

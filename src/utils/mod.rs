@@ -24,3 +24,16 @@ pub fn get_resources_path() -> String {
     format!("{}/Resources/assets", target_path)
   }
 }
+
+pub fn get_parser_path() -> String {
+  if cfg!(feature="debug") {
+    String::from("./wiki-parser/main.py")
+  } else {
+    let mut exec_path = current_exe().unwrap();
+    exec_path.pop();
+    exec_path.pop();
+    
+    let target_path = exec_path.to_str().unwrap();
+    format!(".{}/Resources/wiki-parser/main.py", target_path)
+  }
+}
