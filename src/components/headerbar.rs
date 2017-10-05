@@ -5,6 +5,7 @@ use std::cell::RefCell;
 use std::rc::Rc;
 use gtk;
 
+use gtk::ToggleButtonExt;
 use gtk::HeaderBarExt;
 use gtk::ButtonExt;
 use gtk::ImageExt;
@@ -67,11 +68,32 @@ impl AppHeaderBar {
     });
   }
 
+  fn setup_navs(&self) {
+    let pages = vec![ "home", "reader", "about" ];
+
+    for name in &pages {
+      let name = name.clone();
+      
+      let button: gtk::RadioButton = self.builder.get_object(&*format!("btn-tab-{}", &name)).unwrap();
+      let events = self.events.clone();
+
+      button.connect_toggled(move |event| {        
+        if event.get_active() {
+          events.borrow_mut().push(Event::OpenPage(
+            String::from(name.clone()),
+            String::from("")
+          ));
+        }
+      });
+    }
+  }
+
   pub fn setup(&self) {
     self.headerbar.set_decoration_layout(Some(""));
     
     self.subscribe_event();
     self.setup_search();
     self.setup_childs();
+    self.setup_navs();
   }
 }

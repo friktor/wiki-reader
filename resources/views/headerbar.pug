@@ -8,10 +8,10 @@ interface
     style: class(name="page-tabs")/
   
     child
-      object(class="GtkRadioButton" id="page-tabs")
+      object(class="GtkRadioButton" id="btn-tab-home")
         style: class(name="image-button")/
         property(name="draw-indicator") 0
-        property(name="group") page-tabs
+        property(name="group") btn-tab-home
         property(name="label") Home
         property(name="visible") 1
         property(name="active") 1
@@ -24,7 +24,7 @@ interface
       object(class="GtkRadioButton" id="btn-tab-reader")
         style: class(name="image-button")/
         property(name="draw-indicator") 0
-        property(name="group") page-tabs
+        property(name="group") btn-tab-home
         property(name="label") Reader
         property(name="visible") 1
         property(name="active") 0
@@ -37,7 +37,7 @@ interface
       object(class="GtkRadioButton" id="btn-tab-about")
         style: class(name="image-button")/
         property(name="draw-indicator") 0
-        property(name="group") page-tabs
+        property(name="group") btn-tab-home
         property(name="label") About
         property(name="visible") 1
         property(name="active") 0
