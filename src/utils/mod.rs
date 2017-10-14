@@ -13,27 +13,27 @@ pub fn add_class_to_widget<T: gtk::WidgetExt>(widget: &T, class: &str) {
 }
 
 pub fn get_resources_path() -> String {
-  if cfg!(feature="debug") {
-    String::from("./assets")
-  } else {
+  if cfg!(feature="release") {
     let mut exec_path = current_exe().unwrap();
     exec_path.pop();
     exec_path.pop();
     
     let target_path = exec_path.to_str().unwrap();
     format!("{}/Resources/assets", target_path)
+  } else {
+    String::from("./assets")
   }
 }
 
 pub fn get_parser_path() -> String {
-  if cfg!(feature="debug") {
-    String::from("./wiki-parser/main.py")
-  } else {
+  if cfg!(feature="release") {
     let mut exec_path = current_exe().unwrap();
     exec_path.pop();
     exec_path.pop();
     
     let target_path = exec_path.to_str().unwrap();
     format!(".{}/Resources/wiki-parser/main.py", target_path)
+  } else {
+    String::from("./wiki-parser/main.py")
   }
 }

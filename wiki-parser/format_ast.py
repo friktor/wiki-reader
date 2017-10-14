@@ -1,18 +1,63 @@
 import mwparserfromhell as parser
 import re
 
-def w_link(link):
+ExternalLink = parser.nodes.external_link.ExternalLink
+Argument = parser.nodes.argument.Argument
+Template = parser.nodes.template.Template
+Wikilink = parser.nodes.wikilink.Wikilink
+Comment = parser.nodes.comment.Comment
+Heading = parser.nodes.heading.Heading
+Text = parser.nodes.text.Text
+Tag = parser.nodes.tag.Tag
+Node = parser.nodes.Node
+
+def get_heading(heading):
   return {
-    "title": str(link.title),
-    "wikicode": str(link),
-    "url": str(link.url),
-    "type": "link",
+    "title": str(heading.title),
+    "level": heading.level,
+    "type": "heading",
   }
 
-def w_wikilink(link):
+def get_template(template):
+  params = template.params
+  name = str(template.name)
+  
   result = {
-    "title": str(link.title),
-    "wikicode": str(link)
+    "type": "template",
+    "content": [],
+    "params": {},
+    "name": name,
+  }
+
+  for param in params:
+    if param.showkey:
+      result["params"][str(param.name)] = str(param.value)
+    else:
+      result["content"].append(normalize_section(param.value.nodes))
+  
+  return result
+
+def get_tag(tag):
+  result = {
+    "closing_tag": str(tag.closing_tag),
+    "self_closing": tag.self_closing,
+    "attributes": tag.attributes,
+    "implicit": tag.implicit,
+    "type": "tag"
+  }
+
+  if tag.closing_wiki_markup:
+    result["closing_wiki_markup"] = str(tag.closing_wiki_markup),
+
+  if tag.contents:
+    result["properties"] = normalize_section(tag.contents.nodes)
+  else:
+    result["properties"] = []
+  return result
+
+def get_wikilink(link):
+  result = {
+    "title": str(link.title)
   }
 
   matching_file = re.compile("^(File|Файл):.*$")
@@ -27,83 +72,49 @@ def w_wikilink(link):
     result["text"] = str(link.text)
   return result
 
-def w_heading(heading):
+def get_external_link(link):
   return {
-    "title": str(heading.title),
-    "wikicode": str(heading),
-    "level": heading.level,
-    "type": "heading",
+    "title": str(link.title),
+    "url": str(link.url),
+    "type": "link",
   }
 
-def w_tag(tag):
-  result = {
-    "closing_tag": str(tag.closing_tag),
-    "self_closing": tag.self_closing,
-    "attributes": tag.attributes,
-    "implicit": tag.implicit,
-    "type": "tag"
-  }
 
-  if tag.closing_wiki_markup:
-    result["closing_wiki_markup"] = str(tag.closing_wiki_markup),
+def normalize_section(nodes):
+  result = []
 
-  if tag.contents:
-    result["properties"] = block(tag.contents)
-    result["wikicode"] = str(tag.contents)
-  else:
-    result["properties"] = []
-    result["wikicode"] = ""
-  
-  return result
+  for index, node in enumerate(nodes):
+    node_type = type(node)
 
-def w_template(template):
-  params = template.params
-  name = str(template.name)
-  
-  result = {
-    "wikicode": str(template),
-    "type": "template",
-    "content": [],
-    "params": {},
-    "name": name,
-  }
-
-  for param in params:
-    if param.showkey:
-      result["params"][str(param.name)] = str(param.value)
-    else:
-      result["content"].append({
-        "properties": block(param.value),
-        "wikicode": str(param),
-        "type": "section"
+    if node_type == Text:
+      result.append({
+        "text": node.value,
+        "type": "text"
       })
-  
+
+    elif node_type == Heading:
+      heading = get_heading(node)
+      result.append(heading)
+    
+    elif node_type == Template:
+      template = get_template(node)
+      result.append(template)
+    
+    elif node_type == Tag:
+      tag = get_tag(node)
+      result.append(tag)
+    
+    elif node_type == Wikilink:
+      wikilink = get_wikilink(node)
+      result.append(wikilink)
+    
+    elif node_type == ExternalLink:
+      external_link = get_external_link(node)
+      result.append(external_link)
+
   return result
-
-def block(section):
-  links = section.filter_external_links(recursive=False)
-  templates = section.filter_templates(recursive=False)
-  wikilinks = section.filter_wikilinks(recursive=False)
-  headings = section.filter_headings(recursive=False)
-  tags = section.filter_tags(recursive=False)
-
-  _wikilinks = [w_wikilink(link) for link in wikilinks]
-  _templates = [w_template(tmpl) for tmpl in templates]
-  _headings = [w_heading(h) for h in headings]
-  _links = [w_link(link) for link in links]
-  _tags = [w_tag(tag) for tag in tags]
-
-  result = _wikilinks + _templates + _headings + _links + _tags
-  return result
-
-def formating(section, node_type="section"):
-  return {
-    "properties": block(section),
-    "wikicode": str(section),
-    "type": node_type
-  }
 
 def parse(wikicode):
   sections = parser.parse(wikicode).get_sections()
-  formatted = [formating(section) for section in sections]
-  return formatted
+  result_nodes = [ normalize_section(section.nodes) for section in sections ]
+  return result_nodes

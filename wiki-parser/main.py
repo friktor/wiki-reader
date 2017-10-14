@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 
 import format_ast
-import inline_ast
 import json
 import sys
 
@@ -12,7 +11,4 @@ for line in sys.stdin:
   text += line
 
 formatted = format_ast.parse(text)
-# sys.stdout.write(json.dumps(formatted))
-
-inline = inline_ast.parse(formatted)
-sys.stdout.write(json.dumps(inline))
+sys.stdout.write(json.dumps(formatted))
