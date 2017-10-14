@@ -1,13 +1,13 @@
+use fluent::MessageContext;
 use std::cell::RefCell;
 use std::rc::Rc;
 use gtk;
 
 pub trait View {
+  fn setup(&mut self, i18n: Rc<RefCell<MessageContext>>);
   fn on_receive_event(&self, event: Event);
   fn get_content(&self) -> gtk::Box;
-  fn get_title(&self) -> String;
   fn get_name(&self) -> String;
-  fn setup(&mut self);
 }
 
 pub trait Controller {

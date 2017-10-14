@@ -1,10 +1,12 @@
-#![feature(proc_macro, conservative_impl_trait, generators)]
+#![feature(proc_macro, conservative_impl_trait, generators, underscore_lifetimes)]
 #[macro_use] extern crate maplit;
 
+extern crate fluent_locale;
 extern crate inflections;
 extern crate serde_json;
 extern crate gdk_pixbuf;
 extern crate reqwest;
+extern crate fluent;
 extern crate pango;
 extern crate gio;
 extern crate gtk;

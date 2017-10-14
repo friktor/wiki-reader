@@ -4,6 +4,8 @@ use std::rc::Rc;
 use utils::navigator::EventEmitter;
 use utils::traits::{ View, Event };
 use utils::add_class_to_widget;
+use fluent::types::FluentValue;
+use fluent::MessageContext;
 use gdk_pixbuf::{ Pixbuf };
 use gtk;
 
@@ -16,7 +18,6 @@ pub struct About<'a> {
   events: Rc<RefCell<EventEmitter>>,
   builder: gtk::Builder,
   content: gtk::Box,
-  title: String,
   name: &'a str
 }
 
@@ -26,7 +27,6 @@ impl <'a>About<'a> {
     let content: gtk::Box = builder.get_object("page_about").unwrap();
 
     About {
-      title: String::from("About"),
       name: "about",
       builder,
       content,
@@ -84,15 +84,11 @@ impl <'a>View for About<'a> {
     String::from(self.name)
   }
 
-  fn get_title(&self) -> String {
-    self.title.clone()
-  }
-
   fn on_receive_event(&self, event: Event) {
     
   }
 
-  fn setup(&mut self) {
+  fn setup(&mut self, i18n: Rc<RefCell<MessageContext>>) {
     self.prepare_images();
     self.setup_description();
   }

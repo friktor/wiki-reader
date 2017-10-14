@@ -29,7 +29,7 @@ impl Template {
 
     for (index, node) in self.content.iter().enumerate() {
       if index == 1 { add_class_to_widget(&node.layout, "separated") }
-      self.layout.pack_start(&node.layout, false, false, 0);
+      self.layout.pack_start(&node.layout, true, false, 0);
     }
   }
 }

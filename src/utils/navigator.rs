@@ -1,6 +1,8 @@
 use utils::traits::{ Controller, Event };
 use controllers::get_controllers;
+use utils::t_;
 
+use fluent::MessageContext;
 use std::cell::RefCell;
 use std::ops::FnMut;
 use std::rc::Rc;
@@ -82,16 +84,17 @@ impl Navigator {
     });
   }
 
-  pub fn setup(&self) {
+  pub fn setup(&self, i18n: Rc<RefCell<MessageContext>>) {
     let stack = self.stack.clone();
     let pages = self.pages.clone();
     
     for page in pages.borrow().iter() {
       let view = page.get_view();
+      view.borrow_mut().setup(i18n.clone());
 
       let content = view.borrow().get_content();
-      let title = view.borrow().get_title();
       let name = view.borrow().get_name();
+      let title = name.clone();
 
       stack.add_titled(&content, &*name, &*title);
     }

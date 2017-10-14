@@ -11,8 +11,7 @@ pub struct Reader {
 
 impl Reader {
   pub fn new(events: Rc<RefCell<EventEmitter>>) -> Reader {
-    let mut view = ReaderView::new(events);
-    view.setup();
+    let view = ReaderView::new(events);
     
     Reader {
       view: Rc::new(RefCell::new(view))

@@ -5,7 +5,8 @@ use utils::wiki::{ Article, ErrorReason };
 use utils::traits::{ View, Event };
 use utils::navigator::EventEmitter;
 use utils::add_class_to_widget;
-use serde_json::Value;
+use fluent::types::FluentValue;
+use fluent::MessageContext;
 use gtk;
 
 use gtk::ScrolledWindowExt;
@@ -17,7 +18,6 @@ pub struct Reader<'a> {
   events: Rc<RefCell<EventEmitter>>,
   container: gtk::Box,
   content: gtk::Box,
-  title: String,
   name: &'a str
 }
 
@@ -37,7 +37,6 @@ impl <'a>Reader<'a> {
     container.pack_start(&scrolled, true, true, 0);
 
     Reader {
-      title: String::from("Reader"),
       name: "reader",
       container,
       content,
@@ -76,10 +75,6 @@ impl <'a>View for Reader<'a> {
     String::from(self.name)
   }
 
-  fn get_title(&self) -> String {
-    self.title.clone()
-  }
-
   fn on_receive_event(&self, event: Event) {
     match event {
       Event::GetArticle(name) => self.get_article(name),
@@ -87,7 +82,7 @@ impl <'a>View for Reader<'a> {
     }
   }
 
-  fn setup(&mut self) {
+  fn setup(&mut self, i18n: Rc<RefCell<MessageContext>>) {
     
   }
 }

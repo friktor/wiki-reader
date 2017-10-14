@@ -1,39 +1,53 @@
 use components::headerbar::AppHeaderBar;
 use utils::navigator::Navigator;
 use utils::get_resources_path;
-use utils::traits::Event;
+use utils::get_i18n_locale;
 use std::cell::RefCell;
 use std::rc::Rc;
 
+use fluent::MessageContext;
+use fluent_locale::Locale;
 use gtk::prelude::*;
 use gdk::Screen;
 use gtk;
 
-pub struct Application {
+pub struct Application<'a> {
+  i18n: Rc<RefCell<MessageContext<'a>>>,
   navigator: Rc<RefCell<Navigator>>,
+  locale: Rc<RefCell<Locale>>,
   pub window: gtk::Window,
-  headerbar: AppHeaderBar,
   settings: gtk::Settings,
   builder: gtk::Builder,
 }
 
-impl Application {
-  pub fn new() -> Application {
+impl <'a>Application<'a> {
+  pub fn new() -> Application<'a> {
     let builder = gtk::Builder::new_from_resource("/org/gtk/wikireader/ui/app.xml");
     let window: gtk::Window = builder.get_object("app_window").unwrap();
+
+    let (locale, i18n_text) = get_i18n_locale();
+    
+    let i18n = Rc::new(RefCell::new(MessageContext::new(&[ "i18n" ])));
+    let locale = Rc::new(RefCell::new(locale));
+    i18n.borrow_mut().add_messages(&*i18n_text);
+
     let navigator = Rc::new(RefCell::new(Navigator::new()));
     let settings = gtk::Settings::get_default().unwrap();
 
-    let headerbar = AppHeaderBar::new(navigator.borrow().get_events());
+    let events = navigator.borrow().get_events();
+    let headerbar = AppHeaderBar::new(events, i18n.clone());
+
     headerbar.setup();
+    window.set_titlebar(&headerbar.headerbar);
 
     // final blocks
     Application {
       navigator,
-      headerbar,
       settings,
       builder,
-      window
+      locale,
+      window,
+      i18n
     }
   }
 
@@ -42,7 +56,7 @@ impl Application {
     let navigator = self.navigator.clone();
     let events = navigator.borrow().get_events();
 
-    navigator.borrow().setup();
+    navigator.borrow().setup(self.i18n.clone());
 
     // Pages content prepare
     let stack = navigator.borrow().stack.clone();
@@ -54,11 +68,6 @@ impl Application {
         _ => {}
       }
     });
-  }
-
-  fn setup_headerbar(&self) {
-    let headerbar = self.headerbar.headerbar.clone();
-    self.window.set_titlebar(&headerbar);
   }
 
   fn setup_settings(&self) {
@@ -79,7 +88,6 @@ impl Application {
 
   pub fn setup(&self) {
     self.setup_navigator();
-    self.setup_headerbar();
     self.setup_settings();
   }
 }

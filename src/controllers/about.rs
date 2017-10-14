@@ -11,8 +11,7 @@ pub struct About {
 
 impl About {
   pub fn new(events: Rc<RefCell<EventEmitter>>) -> About {
-    let mut view = AboutView::new(events);
-    view.setup();
+    let view = AboutView::new(events);
     
     About {
       view: Rc::new(RefCell::new(view))

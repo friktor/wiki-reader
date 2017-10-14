@@ -11,8 +11,7 @@ pub struct Home {
 
 impl Home {
   pub fn new(events: Rc<RefCell<EventEmitter>>) -> Home {
-    let mut view = HomeView::new(events);
-    view.setup();
+    let view = HomeView::new(events);
     
     Home {
       view: Rc::new(RefCell::new(view))

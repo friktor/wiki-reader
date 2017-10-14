@@ -4,8 +4,10 @@ use std::rc::Rc;
 use components::wiki_switcher::WikiSwitcher;
 use utils::navigator::EventEmitter;
 use utils::traits::{ View, Event };
+use fluent::types::FluentValue;
 use utils::add_class_to_widget;
 use utils::wiki::WikiResource;
+use fluent::MessageContext;
 use gdk_pixbuf::{ Pixbuf };
 use gtk;
 
@@ -22,7 +24,6 @@ pub struct Home<'a> {
   wiki_switcher: WikiSwitcher,
   builder: gtk::Builder,
   content: gtk::Box,
-  title: String,
   name: &'a str
 }
 
@@ -34,7 +35,6 @@ impl <'a>Home<'a> {
 
     Home {
       search_resource: Rc::new(RefCell::new(WikiResource::Lurkmore)),
-      title: String::from("Home"),
       wiki_switcher,
       name: "home",
       builder,
@@ -126,15 +126,11 @@ impl <'a>View for Home<'a> {
     String::from(self.name)
   }
 
-  fn get_title(&self) -> String {
-    self.title.clone()
-  }
-
   fn on_receive_event(&self, event: Event) {
     
   }
 
-  fn setup(&mut self) {
+  fn setup(&mut self, i18n: Rc<RefCell<MessageContext>>) {
     self.prepare_switcher();
     self.prepare_images();
     self.prepare_search_action();
