@@ -16,7 +16,6 @@ pub struct Template {
 impl Template {
   pub fn setup(&self) {
     add_class_to_widget(&self.layout, "template");
-    add_class_to_widget(&self.layout, &*self.name);
 
     match &*self.name {
       "Q" | "Цитата" => self.quote_setup(),
@@ -32,6 +31,7 @@ impl Template {
   }
 
   fn quote_setup(&self) {
+    add_class_to_widget(&self.layout, "Quote");
     self.layout.set_halign(gtk::Align::End);
 
     for (index, node) in self.content.iter().enumerate() {

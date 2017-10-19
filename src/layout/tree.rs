@@ -175,12 +175,8 @@ impl Tree {
         "template" => {
           let (container, is_inline) = self.get_template_node(node);
 
-          if is_inline {
-            let anchor = get_anchor(&buffer, &mut end_iterator);
-            textview.add_child_at_anchor(&container, &anchor);
-          } else {
-            
-          }
+          let anchor = get_anchor(&buffer, &mut end_iterator);
+          textview.add_child_at_anchor(&container, &anchor);
         },
 
         "tag" => {
