@@ -1,6 +1,5 @@
 use utils::traits::{ Controller, Event };
 use controllers::get_controllers;
-use utils::t_;
 
 use fluent::MessageContext;
 use std::cell::RefCell;

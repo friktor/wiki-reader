@@ -27,10 +27,10 @@ pub enum WikiResource {
 #[derive(Clone)]
 pub struct Article {
   pub wikicode: String,
-  pub layout: gtk::Box,
   pub content: Value,
   pub title: String,
   pub page_id: i64,
+  pub tree: Tree,
 }
 
 impl Article {
@@ -98,12 +98,13 @@ impl Article {
 
     let result = match Article::get_wikicode_ast(String::from(wikicode.trim())) {
       Err(reason) => return Err(reason),
+
       Ok(ast) => {
         let mut content = Tree::new(ast.clone());
         content.setup(false);
         
         Article {
-          layout: content.layout.clone(),
+          tree: content,
           content: ast,
           wikicode,
           page_id,

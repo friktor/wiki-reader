@@ -2,6 +2,9 @@ use utils::add_class_to_widget;
 use layout::template::Template;
 use layout::tags::apply_tags;
 use serde_json::Value;
+use std::cell::RefCell;
+use std::ops::FnMut;
+use std::rc::Rc;
 use gtk;
 
 use gtk::{ TextView, Box, Button };
@@ -33,15 +36,48 @@ fn get_styled_textview(textview: TextView, ranges: Vec<(String, String)>) -> Tex
   textview
 }
 
+#[derive(Clone)]
+pub enum ArticleTreeEvent {
+  ExternalLink(String),
+  WikiLink(String)
+}
+
+#[derive(Clone)]
 pub struct Tree {
+  pub events: Rc<RefCell<TreeEventEmitter>>,
   ranges: Vec<(String, String)>,
   pub layout: Box,
   tree: Value
 }
 
+#[derive(Clone)]
+pub struct TreeEventEmitter {
+  listeners: Vec<Rc<RefCell<FnMut(ArticleTreeEvent)>>>
+}
+
+impl TreeEventEmitter {
+  pub fn new() -> TreeEventEmitter {
+    TreeEventEmitter { listeners: Vec::new() }
+  }
+
+  pub fn subscribe<F: FnMut(ArticleTreeEvent)+'static>(&mut self, listener: F) {
+    let cell = Rc::new(RefCell::new(listener));
+    self.listeners.push(cell); 
+  }
+
+  pub fn push(&mut self, event: ArticleTreeEvent) {
+    for listener in self.listeners.iter() {
+      let mut closure = listener.borrow_mut();
+      let _e = event.clone();
+      (&mut *closure)(_e);
+    }
+  }
+}
+
 impl Tree {
   pub fn new(tree: Value) -> Tree {
     Tree {
+      events: Rc::new(RefCell::new(TreeEventEmitter::new())),
       layout: Box::new(gtk::Orientation::Vertical, 0),
       ranges: vec![],
       tree
@@ -140,6 +176,26 @@ impl Tree {
     (template.layout, is_inline)
   }
 
+  fn get_link_button(&self, node_type: &str, text: String, link: &str) -> Button {
+    let button = Button::new_with_label(&*text);
+    add_class_to_widget(&button, "link");
+    
+    let _type = String::from(node_type);
+    let link = String::from(link);
+
+    let events = self.events.clone();
+    button.connect_clicked(move |_| {
+      let link_event = match &*_type {
+        "wikilink" => ArticleTreeEvent::WikiLink(link.clone()),
+        _ => ArticleTreeEvent::ExternalLink(link.clone())
+      };
+        
+      events.borrow_mut().push(link_event);
+    });
+
+    button
+  }
+
   fn render_section(&mut self, textview: &TextView, section: Vec<Value>) -> TextView {
     let mut textview = textview.clone();
 
@@ -157,14 +213,14 @@ impl Tree {
           let (text, tag) = self.get_text_node(node);
 
           if tag == "link" {
-            let button = Button::new_with_label(&*text);
-            add_class_to_widget(&button, "link");
+            let link = match node_type {
+              "wikilink" => node["title"].as_str().unwrap(),
+              _ => node["url"].as_str().unwrap()
+            };
 
-            button.connect_clicked(move |_| {
-              println!("clicked to button");
-            });
-
+            let button = self.get_link_button(node_type.clone(), text.clone(), link.clone());
             let anchor = get_anchor(&buffer, &mut end_iterator);
+            
             textview.add_child_at_anchor(&button, &anchor);
           } else {
             buffer.insert(&mut end_iterator, &*text);

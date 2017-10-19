@@ -3,9 +3,9 @@ use std::rc::Rc;
 
 use utils::wiki::{ Article, ErrorReason };
 use utils::traits::{ View, Event };
+use layout::tree::ArticleTreeEvent;
 use utils::navigator::EventEmitter;
 use utils::add_class_to_widget;
-use fluent::types::FluentValue;
 use fluent::MessageContext;
 use gtk;
 
@@ -31,7 +31,6 @@ impl <'a>Reader<'a> {
     scrolled.set_policy(gtk::PolicyType::Automatic, gtk::PolicyType::Automatic);
 
     let content = gtk::Box::new(gtk::Orientation::Vertical, 0);
-    // add_class_to_widget(&content, "too-big-box");
 
     scrolled.add(&content);
     container.pack_start(&scrolled, true, true, 0);
@@ -52,14 +51,36 @@ impl <'a>Reader<'a> {
   }
 
   fn get_article(&self, name: String) {
-    // Next need add error handle
     match Article::new_from_title(name.clone()) {
       Err(_) => {
         // TODO: Adding handle view if get error
       },
       Ok(article) => {        
         self.clear_content();
-        self.content.pack_start(&article.layout, false, true, 0);
+        
+        self.content.pack_start(&article.tree.layout, false, true, 0);
+        let article_name = article.title.clone();
+        
+        let global_events = self.events.clone();
+        article.tree.events.borrow_mut().subscribe(move |event| {
+          println!("event on page: {}", &article_name);
+
+          match event {
+            ArticleTreeEvent::ExternalLink(url) => {
+              println!("open external link: {}", &url);
+            },
+
+            ArticleTreeEvent::WikiLink(name) => {
+              println!("open wiki link: {}", &name);
+              
+              global_events.borrow_mut().push(Event::GetArticle(
+                String::from(name)
+              ));
+            },
+            _ => {}
+          }
+        });
+        
         self.content.show_all();
       }
     }
