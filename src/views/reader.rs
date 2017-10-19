@@ -6,6 +6,7 @@ use utils::traits::{ View, Event };
 use layout::tree::ArticleTreeEvent;
 use utils::navigator::EventEmitter;
 use utils::add_class_to_widget;
+use utils::wiki::WikiResource;
 use fluent::MessageContext;
 use gtk;
 
@@ -50,8 +51,8 @@ impl <'a>Reader<'a> {
     }
   }
 
-  fn get_article(&self, name: String) {
-    match Article::new_from_title(name.clone()) {
+  fn get_article(&self, name: String, resource: WikiResource) {
+    match Article::get_article_by_title(name.clone(), resource.clone()) {
       Err(_) => {
         // TODO: Adding handle view if get error
       },
@@ -74,7 +75,8 @@ impl <'a>Reader<'a> {
               println!("open wiki link: {}", &name);
               
               global_events.borrow_mut().push(Event::GetArticle(
-                String::from(name)
+                String::from(name),
+                resource.clone()
               ));
             },
             _ => {}
@@ -98,7 +100,7 @@ impl <'a>View for Reader<'a> {
 
   fn on_receive_event(&self, event: Event) {
     match event {
-      Event::GetArticle(name) => self.get_article(name),
+      Event::GetArticle(name, resource) => self.get_article(name, resource),
       _ => {}
     }
   }

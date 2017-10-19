@@ -1,3 +1,4 @@
+use utils::wiki::WikiResource;
 use fluent::MessageContext;
 use std::cell::RefCell;
 use std::rc::Rc;
@@ -17,7 +18,7 @@ pub trait Controller {
 
 #[derive(Clone)]
 pub enum Event {
-  GetArticle(String),
+  GetArticle(String, WikiResource),
   OpenPage(String, String), // Page name, title
   ToggleSidebar,
 }

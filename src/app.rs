@@ -35,7 +35,7 @@ impl <'a>Application<'a> {
     let settings = gtk::Settings::get_default().unwrap();
 
     let events = navigator.borrow().get_events();
-    let headerbar = AppHeaderBar::new(events, i18n.clone());
+    let mut headerbar = AppHeaderBar::new(events, i18n.clone());
 
     headerbar.setup();
     window.set_titlebar(&headerbar.headerbar);

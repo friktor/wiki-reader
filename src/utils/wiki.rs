@@ -34,14 +34,7 @@ pub struct Article {
 }
 
 impl Article {
-  pub fn new_from_title(title: String) -> Result<Article, ErrorReason> {
-    match Article::get_article_by_title(title, WikiResource::Lurkmore) {
-      Ok(response) => Article::normalize_response(response),
-      Err(reason) => Err(reason)
-    }
-  }
-
-  fn get_article_by_title(title: String, resource: WikiResource) -> Result<Value, ErrorReason> {
+  pub fn get_article_by_title(title: String, resource: WikiResource) -> Result<Article, ErrorReason> {
     let url = Article::generate_url(resource, hashmap!{
       "action" => "query",
       "titles" => &title[..],
@@ -57,7 +50,7 @@ impl Article {
         let json = response.json();
         match json {
           Err(_) => Err(ErrorReason::Parsing),
-          Ok(tree) => Ok(tree)
+          Ok(tree) => Article::normalize_response(tree)
         }
       },
 

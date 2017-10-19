@@ -71,7 +71,7 @@ impl Navigator {
     events.borrow_mut().subscribe(move |event| {
       match event {
         Event::OpenPage(name, _) => stack.set_visible_child_name(&*name),
-        Event::GetArticle(_) => stack.set_visible_child_name("reader"),
+        Event::GetArticle(_, _) => stack.set_visible_child_name("reader"),
         _ => {}
       } 
     });

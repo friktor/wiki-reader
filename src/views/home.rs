@@ -4,7 +4,6 @@ use std::rc::Rc;
 use components::wiki_switcher::WikiSwitcher;
 use utils::navigator::EventEmitter;
 use utils::traits::{ View, Event };
-use fluent::types::FluentValue;
 use utils::add_class_to_widget;
 use utils::wiki::WikiResource;
 use fluent::MessageContext;
@@ -108,10 +107,13 @@ impl <'a>Home<'a> {
     let entry: gtk::Entry = self.builder.get_object("entry-search").unwrap();
     let button: gtk::Button = self.builder.get_object("button-search").unwrap();
 
+    let search_resource = self.search_resource.clone();
     let events = self.events.clone();
+    
     button.connect_clicked(move |_| {
       if let Some(article_name) = entry.get_text() {
-        events.borrow_mut().push(Event::GetArticle(article_name));
+        let resource = search_resource.borrow().clone();
+        events.borrow_mut().push(Event::GetArticle(article_name, resource));
       }
     });
   }
