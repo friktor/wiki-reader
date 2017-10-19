@@ -8,8 +8,8 @@ use gtk::BoxExt;
 
 pub struct Template {
   pub params: Map<String, Value>,
-  pub layout: gtk::Box,
   pub content: Vec<Tree>,
+  pub layout: gtk::Box,
   pub name: String,
 }
 
@@ -21,6 +21,13 @@ impl Template {
     match &*self.name {
       "Q" | "Цитата" => self.quote_setup(),
       _ => {}
+    }
+  }
+
+  pub fn is_inline(&self) -> bool {
+    match &*self.name {
+      "Q" | "Цитата" => false,
+      _ => true
     }
   }
 

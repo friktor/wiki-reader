@@ -13,7 +13,7 @@ Node = parser.nodes.Node
 
 def get_heading(heading):
   return {
-    "title": str(heading.title),
+    "title": str(heading.title).strip(),
     "level": heading.level,
     "type": "heading",
   }

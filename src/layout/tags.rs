@@ -19,9 +19,23 @@ fn link_tag() -> gtk::TextTag {
   tag
 }
 
-fn heading_tag() -> gtk::TextTag {
-  let tag = gtk::TextTag::new(Some("heading"));
-  tag.set_property_size(25);
+fn heading_tag(level: i32) -> gtk::TextTag {
+  let name = format!("heading{}", &level);
+  let tag = gtk::TextTag::new(Some(&*name));
+
+  let color = gdk::RGBA::from_str("#263238").unwrap();
+  tag.set_property_foreground_rgba(Some(&color));  
+  
+  match level {
+    1 => tag.set_property_size_points(25.0),
+    2 => tag.set_property_size_points(22.0),
+    3 => tag.set_property_size_points(19.0),
+    4 => tag.set_property_size_points(16.0),
+    5 => tag.set_property_size_points(14.0),
+    6 => tag.set_property_size_points(12.0),
+    _ => {}
+  }
+
   tag
 }
 
@@ -72,8 +86,10 @@ pub fn apply_tags(buffer: &gtk::TextBuffer) {
     let link = link_tag();
     table.add(&link);
 
-    let heading = heading_tag();
-    table.add(&heading);
+    (1..6).for_each(|level| {
+      let heading = heading_tag(level);
+      table.add(&heading);
+    });
 
     let text = text_tag();
     table.add(&text);

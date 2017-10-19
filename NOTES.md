@@ -43,3 +43,6 @@ Building only assets
   - [x] popover selection of target resources
   - [ ] autosuggest for search input
   - [ ] info blocks for home
+
+# Refactoring todo
+* Replace many boxed textviews to one global textview with templates as anchored widgets
