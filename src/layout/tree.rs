@@ -7,6 +7,7 @@ use std::ops::FnMut;
 use std::rc::Rc;
 use gtk;
 
+use gdk_pixbuf::{ Pixbuf, Colorspace };
 use gtk::{ TextView, Box, Button };
 use gtk::TextBufferExt;
 use gtk::TextViewExt;
@@ -36,6 +37,11 @@ fn get_styled_textview(textview: TextView, ranges: Vec<(String, String)>) -> Tex
   textview
 }
 
+// fn get_screenshot_button() -> Button {
+//   let button = Button::new_with_label("Capture Screenshot");
+//   button
+// }
+
 #[derive(Clone)]
 pub enum ArticleTreeEvent {
   ExternalLink(String),
@@ -46,6 +52,7 @@ pub enum ArticleTreeEvent {
 pub struct Tree {
   pub events: Rc<RefCell<TreeEventEmitter>>,
   ranges: Vec<(String, String)>,
+  textview: TextView,
   pub layout: Box,
   tree: Value
 }
@@ -79,6 +86,7 @@ impl Tree {
     Tree {
       events: Rc::new(RefCell::new(TreeEventEmitter::new())),
       layout: Box::new(gtk::Orientation::Vertical, 0),
+      textview: TextView::new(),
       ranges: vec![],
       tree
     }
@@ -93,30 +101,24 @@ impl Tree {
 
     if single_section {
       if let Some(section) = self.tree.clone().as_array() {
-        self.render_section(&textview, section.clone());
+        self.render_section(&textview, section.clone(), None);
       }
     } else {
       if let Some(sections) = self.tree.clone().as_array() {
         for section in sections {
           if let Some(section) = section.clone().as_array() {
-            self.render_section(&textview, section.clone());
+            self.render_section(&textview, section.clone(), None);
           }
         }
       }
     }
 
+    // let screenshot_button = get_screenshot_button();
+    // self.layout.pack_start(&screenshot_button, false, true, 0);
+
     let layout = get_styled_textview(textview, self.ranges.clone());
-    self.layout.pack_start(&layout, false, true, 0);
-  }
-
-  fn get_tag_node(&mut self, textview: &TextView, node: &Value) -> TextView {
-    let content_nodes = node["properties"].as_array().unwrap();
-    let tag_name = node["closing_tag"].as_str().unwrap();
-    let mut result_textview = textview.clone();
-
-    let result_content = self.render_section(&result_textview, content_nodes.clone());
-    result_textview = result_content;
-    result_textview
+    self.textview = layout;
+    self.layout.pack_start(&self.textview, false, true, 0);
   }
 
   // Return text nodes for insert and tag type
@@ -124,7 +126,7 @@ impl Tree {
     let node_type = node["type"].as_str().expect("Cannot get node type");
     
     let text_key = match node_type {
-      "link" | "heading" => "title",
+      "link" => "title",
       "text" => "text",
       "wikilink" => {
         if node["text"].is_null() 
@@ -138,9 +140,6 @@ impl Tree {
     let mut tag = String::new();
     if node_type == "wikilink" || node_type == "link" {
       tag.push_str("link");
-    } else if node_type == "heading" {
-      let level = node["level"].as_i64().expect("Cant load heading level");
-      tag = format!("heading{}", level);
     } else {
       tag.push_str(node_type.clone());
     }
@@ -176,6 +175,15 @@ impl Tree {
     (template.layout, is_inline)
   }
 
+  fn get_tag_node(&mut self, textview: &TextView, node: &Value, tag_name: String) -> TextView {
+    let content_nodes = node["properties"].as_array().unwrap();
+    let mut result_textview = textview.clone();
+
+    let result_content = self.render_section(&result_textview, content_nodes.clone(), Some(tag_name));
+    result_textview = result_content;
+    result_textview
+  }
+
   fn get_link_button(&self, node_type: &str, text: String, link: &str) -> Button {
     let button = Button::new_with_label(&*text);
     add_class_to_widget(&button, "link");
@@ -196,7 +204,11 @@ impl Tree {
     button
   }
 
-  fn render_section(&mut self, textview: &TextView, section: Vec<Value>) -> TextView {
+  fn render_section(
+    &mut self, textview: &TextView,
+    section: Vec<Value>,
+    as_tag: Option<String>
+  ) -> TextView {
     let mut textview = textview.clone();
 
     fn get_anchor(b: &gtk::TextBuffer, i: &mut gtk::TextIter) -> gtk::TextChildAnchor {
@@ -208,8 +220,8 @@ impl Tree {
       let node_type = node["type"].as_str().unwrap();
       let mut end_iterator = buffer.get_end_iter();
 
-      match node_type {
-        "link" | "text" | "wikilink" | "heading" => {
+      match node_type.clone() {
+        "link" | "text" | "wikilink" => {
           let (text, tag) = self.get_text_node(node);
 
           if tag == "link" {
@@ -220,11 +232,19 @@ impl Tree {
 
             let button = self.get_link_button(node_type.clone(), text.clone(), link.clone());
             let anchor = get_anchor(&buffer, &mut end_iterator);
+
+            if let Some(tag_name) = as_tag.clone() {
+              add_class_to_widget(&button, &*tag_name);
+            }
             
             textview.add_child_at_anchor(&button, &anchor);
           } else {
             buffer.insert(&mut end_iterator, &*text);
-            self.ranges.push((text, tag));
+            self.ranges.push((text.clone(), tag));
+            
+            if let Some(tag_name) = as_tag.clone() {
+              self.ranges.push((text, tag_name));
+            }
           }
         },
         
@@ -235,8 +255,22 @@ impl Tree {
           textview.add_child_at_anchor(&container, &anchor);
         },
 
-        "tag" => {
-          let _textview = self.get_tag_node(&textview, node);
+        "tag" | "heading" => {
+          let tag_name = match node_type {
+            "tag" => {
+              let closing_tag = node["closing_tag"].as_str().unwrap();
+              String::from(closing_tag)
+            },
+            
+            "heading" => {
+              let level = node["level"].as_i64().expect("Cant load heading level");
+              format!("heading{}", level)
+            },
+
+            _ => String::from("")
+          };
+
+          let _textview = self.get_tag_node(&textview, node, tag_name);
           textview = _textview;
         },
         

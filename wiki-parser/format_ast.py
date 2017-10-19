@@ -12,8 +12,12 @@ Tag = parser.nodes.tag.Tag
 Node = parser.nodes.Node
 
 def get_heading(heading):
+  properties = normalize_section(heading.title.nodes)
+  if properties[0]["type"] == "text":
+    properties[0]["text"] = properties[0]["text"].lstrip()
+
   return {
-    "title": str(heading.title).strip(),
+    "properties": properties,
     "level": heading.level,
     "type": "heading",
   }
@@ -40,8 +44,8 @@ def get_template(template):
 def get_tag(tag):
   result = {
     "closing_tag": str(tag.closing_tag),
+    "attributes": str(tag.attributes),
     "self_closing": tag.self_closing,
-    "attributes": tag.attributes,
     "implicit": tag.implicit,
     "type": "tag"
   }

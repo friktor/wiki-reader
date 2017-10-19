@@ -7,8 +7,6 @@
 
     <file>images/wikipedia-logo.png</file>
     <file>images/lurkmore-logo.png</file>
-    
-    <file>images/about-bg.jpeg</file>
     <file>images/home-bg.jpeg</file>
 
     <file compressed="true">ui/headerbar.xml</file>
