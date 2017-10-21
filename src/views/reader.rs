@@ -1,13 +1,13 @@
 use std::cell::RefCell;
 use std::rc::Rc;
 
-use utils::wiki::{ Article, ErrorReason };
 use utils::traits::{ View, Event };
 use layout::tree::ArticleTreeEvent;
 use utils::navigator::EventEmitter;
 use utils::add_class_to_widget;
 use utils::wiki::WikiResource;
 use fluent::MessageContext;
+use utils::wiki::Article;
 use gtk;
 
 use gtk::ScrolledWindowExt;
@@ -78,8 +78,7 @@ impl <'a>Reader<'a> {
                 String::from(name),
                 resource.clone()
               ));
-            },
-            _ => {}
+            }
           }
         });
         

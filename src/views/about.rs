@@ -4,7 +4,6 @@ use std::rc::Rc;
 use utils::navigator::EventEmitter;
 use utils::traits::{ View, Event };
 use utils::add_class_to_widget;
-use fluent::types::FluentValue;
 use fluent::MessageContext;
 use gdk_pixbuf::{ Pixbuf };
 use gtk;
@@ -15,7 +14,7 @@ use gtk::ImageExt;
 use gtk::BoxExt;
 
 pub struct About<'a> {
-  events: Rc<RefCell<EventEmitter>>,
+  _events: Rc<RefCell<EventEmitter>>,
   builder: gtk::Builder,
   content: gtk::Box,
   name: &'a str
@@ -23,14 +22,14 @@ pub struct About<'a> {
 
 impl <'a>About<'a> {
   pub fn new(events: Rc<RefCell<EventEmitter>>) -> About<'a> {
-    let builder = gtk::Builder::new_from_resource("/org/gtk/wikireader/ui/about.xml");
+    let builder = gtk::Builder::new_from_resource("/org/wikireader/ui/about.xml");
     let content: gtk::Box = builder.get_object("page_about").unwrap();
 
     About {
+      _events: events,
       name: "about",
       builder,
-      content,
-      events
+      content
     }
   }
 
@@ -57,7 +56,7 @@ impl <'a>About<'a> {
       let image: Option<gtk::Image> = self.builder.get_object(&*id);
       
       if let Some(img) = image {
-        let path = format!("/org/gtk/wikireader/images/{}.png", &name);
+        let path = format!("/org/wikireader/images/{}.png", &name);
         
         let size = match name.clone() {
           "search" => 15,

@@ -61,7 +61,7 @@ impl WikiSwitcher {
       add_class_to_widget(&row, "popover-row");
       
       let path = format!(
-        "/org/gtk/wikireader/images/{}-logo.png",
+        "/org/wikireader/images/{}-logo.png",
         to_lower_case(resource.clone())
       );
 

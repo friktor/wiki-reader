@@ -9,3 +9,4 @@ Cargo.lock
 **/wiki-parser/*.lock
 **/wiki-parser/*.log
 /.vscode/
+**/wiki-parser/tests/wiki.txt

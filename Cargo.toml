@@ -5,12 +5,12 @@ authors = ["Anton Shramko <antonshramko@yandex.ru>"]
 description = "Application for simple reading wiki sites"
 
 [dependencies]
-serde_json = "1.0"
-serde_derive = "*"
-serde = "*"
-
 fluent-locale = "0.2.0"
+serde_json = "1.0"
+tokio-core = "0.1"
 inflections = "*"
+tokio-io = "0.1"
+futures = "0.1"
 reqwest = "0.7"
 hyper = "0.11"
 fluent = "*"
@@ -33,7 +33,7 @@ release = []
 
 [package.metadata.bundle]
 name = "WikiReader"
-identifier = "org.gtk.wikireader"
+identifier = "org.wikireader"
 icon = ["logo.png"]
 version = "0.1.0"
 resources = ["assets", "wiki-parser"]

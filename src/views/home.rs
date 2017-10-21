@@ -28,7 +28,7 @@ pub struct Home<'a> {
 
 impl <'a>Home<'a> {
   pub fn new(events: Rc<RefCell<EventEmitter>>) -> Home<'a> {
-    let builder = gtk::Builder::new_from_resource("/org/gtk/wikireader/ui/home.xml");
+    let builder = gtk::Builder::new_from_resource("/org/wikireader/ui/home.xml");
     let content: gtk::Box = builder.get_object("page_home").unwrap();
     let wiki_switcher = WikiSwitcher::new();
 
@@ -50,7 +50,7 @@ impl <'a>Home<'a> {
       let image: Option<gtk::Image> = self.builder.get_object(&*id);
       
       if let Some(img) = image {
-        let path = format!("/org/gtk/wikireader/images/{}.png", &name);
+        let path = format!("/org/wikireader/images/{}.png", &name);
         
         let size = match name.clone() {
           "search" => 15,

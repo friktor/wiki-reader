@@ -7,7 +7,6 @@ use gtk;
 
 use components::wiki_switcher::WikiSwitcher;
 use utils::navigator::EventEmitter;
-use utils::add_class_to_widget;
 use utils::wiki::WikiResource;
 use fluent::MessageContext;
 
@@ -46,7 +45,7 @@ impl <'a>AppHeaderBar<'a> {
     events: Rc<RefCell<EventEmitter>>,
     i18n: Rc<RefCell<MessageContext>>
   ) -> AppHeaderBar {
-    let builder = gtk::Builder::new_from_resource("/org/gtk/wikireader/ui/headerbar.xml");
+    let builder = gtk::Builder::new_from_resource("/org/wikireader/ui/headerbar.xml");
     let headerbar: gtk::HeaderBar = builder.get_object("app_headerbar").unwrap();
     let search: gtk::Entry = builder.get_object("search_input").unwrap();
     
@@ -117,7 +116,6 @@ impl <'a>AppHeaderBar<'a> {
       headerbar.set_title(Some(&*title));
     }
 
-    let builder = self.builder.clone();
     let events = self.events.clone();
     let _titles = titles.clone();
 

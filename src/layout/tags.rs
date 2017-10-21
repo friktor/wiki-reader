@@ -1,12 +1,35 @@
 use std::str::FromStr;
-use serde_json::Value;
 use pango;
 use gdk;
 use gtk;
 
 use gtk::TextTagTableExt;
 use gtk::TextBufferExt;
+use gtk::TextViewExt;
 use gtk::TextTagExt;
+
+pub fn get_styled_textview(textview: gtk::TextView, ranges: Vec<(String, String)>) -> gtk::TextView {
+  let buffer = textview.get_buffer().unwrap();
+  let start_iter = buffer.get_start_iter();
+  
+  // adding styling tags to textview
+  apply_tags(&buffer);
+  
+  // apply styles by tag to textview blocks by range 
+  for range in &ranges {
+    let text = &range.0;
+    let tag = &range.1;
+
+    if let Some(ranges) = start_iter.forward_search(&*text, gtk::TEXT_SEARCH_TEXT_ONLY, None) {
+      let start_range = ranges.0;
+      let end_range = ranges.1;
+
+      buffer.apply_tag_by_name(&*tag, &start_range, &end_range);
+    }
+  }
+
+  textview
+}
 
 // TODO: creating macros for fast creating tags with properties
 // text_tag!("name_tag", { background: "#FFF", color: "#EEE", weight: 500, size: 20 })

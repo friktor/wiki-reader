@@ -5,8 +5,12 @@ extern crate fluent_locale;
 extern crate inflections;
 extern crate serde_json;
 extern crate gdk_pixbuf;
+extern crate tokio_core;
+extern crate tokio_io;
+extern crate futures;
 extern crate reqwest;
 extern crate fluent;
+extern crate hyper;
 extern crate pango;
 extern crate gio;
 extern crate gtk;
@@ -44,8 +48,10 @@ fn main() {
 
   gtk::init().expect("Failed to initialize GTK.");
 
-  let wiki_reader_app = gtk::Application::new(Some("org.gtk.wikireader"), gio::APPLICATION_FLAGS_NONE)
-    .expect("Failed to create application.");
+  let wiki_reader_app = gtk::Application::new(
+    Some("org.wikireader"),
+    gio::APPLICATION_FLAGS_NONE
+  ).expect("Failed to create application.");
 
   wiki_reader_app.connect_activate(move |wiki_reader_app| {
     if let Some(window) = wiki_reader_app.get_active_window() {
@@ -60,7 +66,5 @@ fn main() {
     }
   });
 
-  wiki_reader_app.run(&[
-    "--g-fatal-warnings"
-  ]);
+  wiki_reader_app.run(&[]);
 }

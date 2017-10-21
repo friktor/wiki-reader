@@ -6,7 +6,6 @@ use std::io::prelude::*;
 use std::error::Error;
 use reqwest::get;
 use url::Url;
-use gtk;
 
 use layout::tree::Tree;
 

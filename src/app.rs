@@ -22,7 +22,7 @@ pub struct Application<'a> {
 
 impl <'a>Application<'a> {
   pub fn new() -> Application<'a> {
-    let builder = gtk::Builder::new_from_resource("/org/gtk/wikireader/ui/app.xml");
+    let builder = gtk::Builder::new_from_resource("/org/wikireader/ui/app.xml");
     let window: gtk::Window = builder.get_object("app_window").unwrap();
 
     let (locale, i18n_text) = get_i18n_locale();

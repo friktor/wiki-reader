@@ -1,41 +1,17 @@
+use layout::tags::get_styled_textview;
 use utils::add_class_to_widget;
 use layout::template::Template;
-use layout::tags::apply_tags;
 use serde_json::Value;
 use std::cell::RefCell;
 use std::ops::FnMut;
 use std::rc::Rc;
 use gtk;
 
-use gdk_pixbuf::{ Pixbuf, Colorspace };
 use gtk::{ TextView, Box, Button };
 use gtk::TextBufferExt;
 use gtk::TextViewExt;
 use gtk::ButtonExt;
 use gtk::BoxExt;
-
-fn get_styled_textview(textview: TextView, ranges: Vec<(String, String)>) -> TextView {
-  let buffer = textview.get_buffer().unwrap();
-  let start_iter = buffer.get_start_iter();
-  
-  // adding styling tags to textview
-  apply_tags(&buffer);
-  
-  // apply styles by tag to textview blocks by range 
-  for range in &ranges {
-    let text = &range.0;
-    let tag = &range.1;
-
-    if let Some(ranges) = start_iter.forward_search(&*text, gtk::TEXT_SEARCH_TEXT_ONLY, None) {
-      let start_range = ranges.0;
-      let end_range = ranges.1;
-
-      buffer.apply_tag_by_name(&*tag, &start_range, &end_range);
-    }
-  }
-
-  textview
-}
 
 // fn get_screenshot_button() -> Button {
 //   let button = Button::new_with_label("Capture Screenshot");
@@ -249,7 +225,7 @@ impl Tree {
         },
         
         "template" => {
-          let (container, is_inline) = self.get_template_node(node);
+          let (container, _) = self.get_template_node(node);
 
           let anchor = get_anchor(&buffer, &mut end_iterator);
           textview.add_child_at_anchor(&container, &anchor);

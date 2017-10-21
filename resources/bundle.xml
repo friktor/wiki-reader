@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <gresources>
-  <gresource prefix="/org/gtk/wikireader">
+  <gresource prefix="/org/wikireader">
     <file>images/settings.png</file>
     <file>images/search.png</file>
     <file>images/logo.png</file>
