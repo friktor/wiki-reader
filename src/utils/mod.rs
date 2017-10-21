@@ -46,8 +46,8 @@ pub fn get_parser_path() -> String {
   }
 }
 
-pub fn get_i18n_locale() -> (Locale, String) {
-  let mut locale = match env::var("LANG") {
+pub fn get_locale() -> Locale {
+  let locale = match env::var("LANG") {
     Ok(code) => {
       let codes: Vec<&str> = code.split(".").collect();
       Locale::from(String::from(codes[0].clone()))
@@ -58,7 +58,13 @@ pub fn get_i18n_locale() -> (Locale, String) {
     }
   };
 
+  locale
+}
+
+pub fn get_i18n_locale() -> (Locale, String) {
+  let mut locale = get_locale();
   let _lc = locale.clone();
+  
   let language = _lc.get_language();
   if language != "ru" || language != "en" {
     locale = Locale::from("en_US");

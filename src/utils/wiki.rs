@@ -1,7 +1,7 @@
 use serde_json::{ Value, from_str as json_from_str };
+use utils::{ get_parser_path, get_locale };
 use std::process::{ Command, Stdio };
 use std::collections::HashMap;
-use utils::get_parser_path;
 use std::io::prelude::*;
 use std::error::Error;
 use reqwest::get;
@@ -138,9 +138,13 @@ impl Article {
     let mut params_url = String::new();
     let mut is_first = true;
 
+    let locale = get_locale();
+    let language = String::from(locale.get_language());
+    let wikipedia_url = format!("https://{}.wikipedia.org/w/api.php", &*language);
+
     let host = match resource {
-      WikiResource::Wikipedia => "https://ru.wikipedia.org/w/api.php",
       WikiResource::Lurkmore => "http://lurkmore.to/api.php",
+      WikiResource::Wikipedia => &*wikipedia_url,
       WikiResource::Custom => "~~~ TODO ~~~"
     };
 
