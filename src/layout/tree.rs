@@ -10,6 +10,7 @@ use gtk;
 use gtk::{ TextView, Box, Button };
 use gtk::TextBufferExt;
 use gtk::TextViewExt;
+use gtk::WidgetExt;
 use gtk::ButtonExt;
 use gtk::BoxExt;
 
@@ -89,12 +90,12 @@ impl Tree {
       }
     }
 
-    // let screenshot_button = get_screenshot_button();
-    // self.layout.pack_start(&screenshot_button, false, true, 0);
-
     let layout = get_styled_textview(textview, self.ranges.clone());
+    layout.hide();
+
     self.textview = layout;
     self.layout.pack_start(&self.textview, false, true, 0);
+    self.layout.show();
   }
 
   // Return text nodes for insert and tag type
@@ -133,8 +134,14 @@ impl Tree {
 
     let mut content: Vec<Tree> = vec![];
     for node in content_nodes {
+      let article_events = self.events.clone();
       let mut node = Tree::new(node.clone());
       node.setup(true);
+      
+      node.events.borrow_mut().subscribe(move |event| {
+        article_events.borrow_mut().push(event.clone());
+      });
+
       content.push(node);
     }
 

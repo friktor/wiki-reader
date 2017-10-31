@@ -71,7 +71,7 @@ impl <'a>Application<'a> {
   }
 
   fn setup_settings(&self) {
-    self.settings.set_property_gtk_theme_name(Some("Arc-Darker"));
+    // self.settings.set_property_gtk_theme_name(Some("Arc-Darker"));
     self.settings.set_property_gtk_enable_animations(true);
 
     let screen = Screen::get_default().unwrap();

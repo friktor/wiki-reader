@@ -167,7 +167,7 @@ impl <'a>AppHeaderBar<'a> {
   }
 
   pub fn setup(&mut self) {
-    self.headerbar.set_decoration_layout(Some(""));
+    // self.headerbar.set_decoration_layout(Some(""));
     
     self.prepare_switcher();
     self.subscribe_event();

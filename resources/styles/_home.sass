@@ -1,6 +1,5 @@
 .home
-  background-image: url('resource:///org/wikireader/images/home-bg.jpeg')
-  background-size: cover
+  background-color: #EEEEEE
   padding-bottom: 0
   padding-top: 50px
 
@@ -10,36 +9,45 @@
   .search
     box-shadow: 0 0 4px transparentize(#000, 0.85)
     margin: 30px 50px 15px 50px
-    border-radius: 35px
+    border-radius: 5px
 
     .input
       background-color: transparentize(#FFF, 0.2)
       color: transparentize(#000, 0.25)
-      border-radius: 35px 0 0 35px
-      padding: 10px 12px
-      font-size: 13px
-      border: none
+      border-bottom-right-radius: 0
+      border-top-right-radius: 0
+      padding: 5px 12px
+      box-shadow: none
+      font-size: 14px
 
       &:focus
         background-color: #FFF
-        border-width: 0
     
     .button
-      border-radius: 0 35px 35px 0
-      background-color: #03A9F4
-      padding: 10px 12px
+      border-bottom-right-radius: 2 // Numix Only
+      border-bottom-left-radius: 0
+      border-top-left-radius: 0
+      background-color: #CC7900
+      padding: 5px 16px
+      box-shadow: none
       font-size: 12px
       border: none
       color: #FFF
 
   .label-info
-    text-shadow: 1px 1px 5px transparentize(#000, 0.5)
+    color: transparentize(#000, 0.15)
     font-size: 15px
-    color: #FFF
   
   .button-wiki-switcher
-    background-color: transparentize(#F5F5F5, 0.1)
     color: transparentize(#000, 0.2)
+    background-color: #F6F8FA
+    box-shadow: none
+    font-weight: 400
     border-radius: 0
     font-size: 15px
     border: none
+
+    &:hover
+      background-color: transparentize(#F6F8FA, 0.4)
+      border-bottom: 2px solid #CC7900
+      box-shadow: none

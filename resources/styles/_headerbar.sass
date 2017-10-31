@@ -1,6 +1,4 @@
 headerbar.titlebar.app-headerbar
-  border-radius: 2px 2px 0 0
-  background-color: #222222
   padding-right: 14px
   padding-left: 14px
   min-height: 38px
@@ -11,31 +9,30 @@ headerbar.titlebar.app-headerbar
   .title
     text-shadow: 0 2px 3px rgba(0,0,0, 0.2)
     color: transparentize(#FFF, 0.25)
-    font-weight: 400
-    font-size: 16px
 
   .page-tabs
     .radio
       background-color: transparent
       transition: all 0.2s ease
       border-radius: 0
-      font-size: 12px
+      font-size: 13px
       border-width: 0
       border-bottom: 2px solid transparent
 
       &:hover
         border-bottom: 1px solid transparentize(#FFF, 0.98)
         background-color: transparentize(#FFF, 0.9)
-      &:checked
+      &:checked, &:focus
         border-bottom: 2px solid #FFF
+        border-right: none
+        border-left: none
+        border-top: none
 
   .headerbar-search
     background-color: transparentize(#FFF, 0.65)
     transition: all 0.2s ease
-    border-radius: 12px
-    padding: 2px 10px
     border-width: 0
-    margin: 8px 0
+    margin: 6px 0
     color: #FFF
 
     &:focus
